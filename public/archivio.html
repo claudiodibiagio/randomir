@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Archivio di Randomir</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Londrina+Solid:wght@400;900&family=Alegreya:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --fondo:#1b1412; --sup:#26211e; --sup2:#332c28; --bordo:#4a3f38; --crema:#f3ead6; --tenue:#b9ab95; --muto:#8d806c; --oro:#d6a84f; --oro2:#f2cf7a;
+  --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500; --s5:#d55181; --s6:#9085e9; --altri:#6f655a;
+}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(ellipse at 30% 0%,#3a1517 0%,var(--fondo) 55%);color:var(--crema);font-family:Alegreya,Georgia,serif;font-size:15px;min-height:100vh}
+a{color:var(--oro2)}
+.pagina{max-width:1240px;margin:0 auto;padding:22px 16px 60px}
+header{display:flex;flex-wrap:wrap;align-items:flex-end;gap:12px 20px;margin-bottom:18px}
+h1{font-family:'Londrina Solid';font-weight:900;font-size:46px;margin:0;color:var(--oro2);line-height:1}
+h1 small{display:block;font-weight:400;font-size:18px;color:var(--tenue);letter-spacing:2px}
+header .spazio{flex:1}
+.torna{font-family:'Londrina Solid';font-size:18px;text-decoration:none;background:#6b3a1f;color:#fbe9c6;padding:7px 14px;border-radius:9px;box-shadow:0 3px 0 #3a1d0e}
+select{font:inherit;background:var(--sup2);color:var(--crema);border:1px solid var(--bordo);border-radius:8px;padding:6px 8px}
+.regole{display:inline-block;background:var(--oro);color:#2b1e04;font-family:'Londrina Solid';font-size:16px;padding:3px 10px;border-radius:7px}
+h2{font-family:'Londrina Solid';font-weight:400;font-size:28px;color:var(--oro2);margin:34px 0 4px;border-bottom:1px solid #d6a84f44;padding-bottom:4px}
+h3{font-family:'Londrina Solid';font-weight:400;font-size:19px;color:var(--oro);margin:16px 0 6px}
+.nota{color:var(--tenue);font-size:13px;font-style:italic;margin:4px 0 10px}
+.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px;margin:10px 0}
+.tile{background:var(--sup2);border:1px solid var(--bordo);border-radius:10px;padding:10px 12px}
+.tile .v{font-family:'Londrina Solid';font-size:32px;line-height:1.05}
+.tile .e{font-size:13px;color:var(--tenue)}
+.duo{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px;align-items:start}
+.blocco{background:var(--sup);border:1px solid var(--bordo);border-radius:12px;padding:12px 14px;margin:10px 0}
+.torta{display:grid;grid-template-columns:150px minmax(0,1fr);gap:14px;align-items:center}
+.torta svg{width:150px;height:150px;display:block}
+.torta svg path{stroke:var(--sup);stroke-width:2}
+.torta svg path:hover{opacity:.82}
+.leg{list-style:none;margin:0;padding:0}
+.leg li{display:grid;grid-template-columns:12px minmax(0,1fr) auto auto;gap:8px;align-items:center;padding:3px 0;border-bottom:1px solid #ffffff0d;font-size:14px}
+.leg i{width:12px;height:12px;border-radius:3px;display:block}
+.leg .n{font-variant-numeric:tabular-nums;color:var(--crema)}
+.leg .p{font-variant-numeric:tabular-nums;color:var(--tenue);min-width:44px;text-align:right}
+.scorri{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th{font-family:'Londrina Solid';font-weight:400;font-size:15px;color:var(--oro);text-align:right;padding:6px 8px;border-bottom:1px solid var(--bordo);white-space:nowrap}
+td{padding:5px 8px;text-align:right;border-bottom:1px solid #ffffff0d;font-variant-numeric:tabular-nums;white-space:nowrap}
+th:first-child,td:first-child{text-align:left}
+td.t{text-align:left;white-space:normal}
+td.fz{white-space:nowrap}
+tr:hover td{background:#ffffff06}
+.pall{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;vertical-align:middle}
+.min{width:34px;height:34px;border-radius:5px;vertical-align:middle;margin-right:8px}
+.barra{display:inline-block;height:8px;border-radius:4px;background:var(--s1);vertical-align:middle;margin-left:6px}
+.calore td.c{color:#fff;text-align:center}
+.vuoto{text-align:center;padding:60px 20px;color:var(--tenue)}
+details{background:var(--sup);border:1px solid var(--bordo);border-radius:10px;margin:8px 0}
+summary{cursor:pointer;padding:10px 14px;display:flex;flex-wrap:wrap;gap:6px 16px;align-items:center;list-style:none}
+summary::-webkit-details-marker{display:none}
+summary::before{content:'▸';color:var(--oro);transition:transform .15s}
+details[open] summary::before{transform:rotate(90deg)}
+summary .num{font-family:'Londrina Solid';font-size:20px;color:var(--oro2)}
+summary .vinc{font-weight:700}
+summary .tenue{color:var(--tenue);font-size:13px}
+details .dentro{padding:4px 14px 14px}
+.cartine{display:flex;flex-wrap:wrap;gap:6px}
+.cartine div{display:flex;flex-direction:column;align-items:center;width:64px;font-size:11px;color:var(--tenue);text-align:center}
+.cartine img{width:56px;height:56px;border-radius:5px}
+.cartine .ok{color:#7fd39a}.cartine .ko{color:#f08a7e}
+.tag{font-size:12px;padding:1px 7px;border-radius:6px;background:#ffffff14;color:var(--tenue)}
+@media (max-width:820px){.duo{grid-template-columns:1fr}.torta{grid-template-columns:120px 1fr}.torta svg{width:120px;height:120px}h1{font-size:36px}}
+</style>
+</head>
+<body>
+<div class="pagina">
+  <header>
+    <h1>L'archivio di Randomir<small>TUTTE LE PARTITE FINITE</small></h1>
+    <span class="spazio"></span>
+    <label class="nota" style="margin:0">Regolamento <select id="versione"></select></label>
+    <a class="torna" href="./">← Torna al menu</a>
+  </header>
+  <div id="contenuto"><div class="vuoto">Carico l'archivio…</div></div>
+</div>
+<script src="motore.js"></script>
+<script>
+'use strict';
+const R = window.Randomir;
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+// data di ogni versione del regolamento: quando cambi le regole aggiungi una riga
+const DATE_VERSIONI = { '1.0': '04/11/2026' };
+const COL_FZ = { scintilla: '#c2185b', costrutto: '#3e8e41', impatto: '#7044a8', lancio: '#d9a514' };
+const SERIE = ['var(--s1)', 'var(--s2)', 'var(--s3)', 'var(--s4)', 'var(--s5)', 'var(--s6)'];
+const NOME_T = { terra: 'Terra', fuoco: 'Fuoco', acqua: 'Acqua' };
+const ALT = ['basso', 'medio', 'alto'];
+const pc = (a, b) => b ? Math.round(100 * a / b) + '%' : '—';
+const md = (a, b, d = 1) => b ? (a / b).toFixed(d).replace('.', ',') : '—';
+const num = x => String(x).replace('.', ',');
+const durata = ms => { if (!ms || ms < 0) return '—'; if (ms < 60000) return Math.max(1, Math.round(ms / 1000)) + ' s'; const m = Math.round(ms / 60000); return m < 60 ? m + ' min' : Math.floor(m / 60) + ' h ' + String(m % 60).padStart(2, '0'); };
+const dataIt = t => new Date(t).toLocaleString('it-IT', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+const chiave = n => String(n).trim().toLowerCase();
+
+/* ---- torta (ciambella) con elenco accanto ---- */
+function torta(voci, opz) {
+  voci = voci.filter(v => v.v > 0);
+  const tot = voci.reduce((s, v) => s + v.v, 0);
+  if (!tot) return `<div class="nota">${(opz && opz.vuoto) || 'Ancora nessun dato.'}</div>`;
+  if (voci.length > 6) { const resto = voci.slice(5); voci = voci.slice(0, 5).concat([{ l: 'Altri', v: resto.reduce((s, v) => s + v.v, 0), c: 'var(--altri)' }]); }
+  let a0 = -Math.PI / 2, paths = '';
+  const R1 = 70, R0 = 42, cx = 75, cy = 75;
+  voci.forEach((v, i) => {
+    const c = v.c || SERIE[i % SERIE.length]; v.c = c;
+    const a1 = a0 + 2 * Math.PI * v.v / tot;
+    const largo = a1 - a0 > Math.PI ? 1 : 0;
+    const p = (r, a) => `${(cx + r * Math.cos(a)).toFixed(2)},${(cy + r * Math.sin(a)).toFixed(2)}`;
+    const d = voci.length === 1 ? `M${cx - R1},${cy}a${R1},${R1} 0 1,0 ${2 * R1},0a${R1},${R1} 0 1,0 ${-2 * R1},0M${cx - R0},${cy}a${R0},${R0} 0 1,1 ${2 * R0},0a${R0},${R0} 0 1,1 ${-2 * R0},0Z`
+      : `M${p(R1, a0)}A${R1},${R1} 0 ${largo},1 ${p(R1, a1)}L${p(R0, a1)}A${R0},${R0} 0 ${largo},0 ${p(R0, a0)}Z`;
+    paths += `<path d="${d}" fill="${c}" fill-rule="evenodd"><title>${esc(v.l)}: ${v.v} (${pc(v.v, tot)})</title></path>`;
+    a0 = a1;
+  });
+  const centro = opz && opz.centro ? `<text x="75" y="72" text-anchor="middle" fill="var(--crema)" font-family="Londrina Solid" font-size="24">${opz.centro}</text><text x="75" y="90" text-anchor="middle" fill="var(--tenue)" font-size="11">${esc(opz.sotto || '')}</text>` : '';
+  return `<div class="torta"><svg viewBox="0 0 150 150" role="img" aria-label="${esc(opz && opz.titolo || '')}">${paths}${centro}</svg>
+    <ul class="leg">${voci.map(v => `<li><i style="background:${v.c}"></i><span>${esc(v.l)}</span><span class="n">${num(v.fmt || v.v)}</span><span class="p">${pc(v.v, tot)}</span></li>`).join('')}</ul></div>`;
+}
+const tile = (v, e) => `<div class="tile"><div class="v">${v}</div><div class="e">${e}</div></div>`;
+const blocco = (titolo, corpo, nota) => `<div class="blocco"><h3>${titolo}</h3>${nota ? `<div class="nota">${nota}</div>` : ''}${corpo}</div>`;
+
+let DATI = null;
+async function carica() {
+  try {
+    const r = await fetch('/api/archivio', { cache: 'no-store' });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    DATI = await r.json();
+  } catch (e) { $('#contenuto').innerHTML = `<div class="vuoto">Non riesco a leggere l'archivio (${esc(e.message)}).<br>L'archivio funziona solo dal sito pubblicato, non aprendo il file dal computer.</div>`; return; }
+  const versioni = [...new Set(DATI.partite.map(p => p.resoconto.v))].sort().reverse();
+  if (!versioni.includes(R.VERSIONE)) versioni.unshift(R.VERSIONE);
+  $('#versione').innerHTML = versioni.map(v => `<option value="${v}">${v}${DATE_VERSIONI[v] ? ' · ' + DATE_VERSIONI[v] : ''}${v === R.VERSIONE ? ' (attuale)' : ''}</option>`).join('') + '<option value="*">tutte le versioni</option>';
+  $('#versione').value = R.VERSIONE;
+  disegna();
+}
+$('#versione').onchange = () => disegna();
+
+function disegna() {
+  const v = $('#versione').value;
+  const P = DATI.partite.filter(p => v === '*' || p.resoconto.v === v).sort((a, b) => b.n - a.n);
+  const intest = `<p><span class="regole">Regolamento ${v === '*' ? 'tutte le versioni' : v + (DATE_VERSIONI[v] ? ' · ' + DATE_VERSIONI[v] : '')}</span>
+    <span class="nota">Entrano in archivio solo le partite online arrivate alla fine. Il tavolo locale non viene registrato.</span></p>`;
+  if (!P.length) { $('#contenuto').innerHTML = intest + '<div class="vuoto">Nessuna partita finita con questo regolamento, per ora.<br>Giocane una fino in fondo e torna qui.</div>'; return; }
+  $('#contenuto').innerHTML = intest + generale(P) + giocatori(P) + fazioni(P) + carte(P) + combattimento(P) + mappa(P) + boost(P) + tempo(P) + elenco(P) +
+    `<p class="nota" style="margin-top:30px">I dati grezzi di tutte le partite: <a href="/api/archivio" target="_blank">archivio in formato JSON</a>.</p>`;
+}
+
+/* ---------------- generale ---------------- */
+function generale(P) {
+  const ms = P.reduce((s, p) => s + (p.fine - p.inizio), 0);
+  const round = P.reduce((s, p) => s + p.resoconto.round, 0);
+  const persone = new Set(P.flatMap(p => p.resoconto.giocatori.map(g => chiave(g.nome)))).size;
+  const per = [2, 3, 4].map(n => ({ l: n + ' giocatori', v: P.filter(p => p.resoconto.n === n).length }));
+  return `<h2>Il quadro</h2><div class="tiles">${tile(P.length, 'partite finite')}${tile(durata(ms), 'giocate in tutto')}${tile(md(round, P.length), 'round per partita')}${tile(durata(ms / P.length), 'durata media')}${tile(persone, 'giocatori diversi')}</div>
+    ${blocco('Partite per numero di giocatori', torta(per, { centro: P.length, sotto: 'partite' }))}`;
+}
+
+/* ---------------- giocatori ---------------- */
+function giocatori(P) {
+  const G = {};
+  for (const p of P) for (const g of p.resoconto.giocatori) {
+    const k = chiave(g.nome), S = p.resoconto.st;
+    const x = G[k] = G[k] || { nome: g.nome, partite: 0, pos: [0, 0, 0, 0, 0], fama: 0, punti: 0, ucc: 0, morti: 0, fz: {} };
+    x.partite++; x.pos[g.posizione]++; x.fama += g.fama; x.punti += g.totale; x.fz[g.fazione] = (x.fz[g.fazione] || 0) + 1;
+    x.ucc += S.uccisioni[g.id].attacco + S.uccisioni[g.id].carta;
+    const m = S.morti[g.id]; x.morti += m.attacco + m.carta + m.evento + m.movimento;
+  }
+  const L = Object.values(G).sort((a, b) => b.pos[1] - a.pos[1] || b.fama - a.fama);
+  const righe = L.map(x => { const pref = Object.entries(x.fz).sort((a, b) => b[1] - a[1])[0];
+    return `<tr><td><b>${esc(x.nome)}</b></td><td>${x.partite}</td><td>${x.pos[1]}</td><td>${x.pos[2]}</td><td>${x.pos[3]}</td><td>${x.pos[4]}</td><td>${pc(x.pos[1], x.partite)}</td><td>${x.fama}</td><td>${md(x.fama, x.partite)}</td><td>${md(x.punti, x.partite)}</td><td>${x.ucc}</td><td>${x.morti}</td><td class="t">${pref ? `<span class="pall" style="background:${COL_FZ[pref[0]]}"></span>${R.NOME_FAZ[pref[0]]}` : ''}</td></tr>`; }).join('');
+  return `<h2>Classifica dei giocatori</h2><div class="nota">A prescindere dalla Faccia usata. In caso di pari punteggio finale, tutti i pari prendono la stessa posizione.</div>
+    <div class="duo"><div class="blocco scorri"><table><tr><th>Giocatore</th><th>Partite</th><th>1°</th><th>2°</th><th>3°</th><th>4°</th><th>% vittorie</th><th>Fama tot.</th><th>Fama media</th><th>Punti medi</th><th>Uccisioni</th><th>Morti</th><th>Faccia più usata</th></tr>${righe}</table></div>
+    ${blocco('Vittorie per giocatore', torta(L.map(x => ({ l: x.nome, v: x.pos[1] })), { vuoto: 'Ancora nessuna vittoria.' }))}</div>`;
+}
+
+/* ---------------- fazioni ---------------- */
+function fazioni(P) {
+  const F = {}; R.FAZIONI.forEach(z => F[z] = { partite: 0, vitt: 0, pos: 0, fama: 0, fa: 0, fc: 0, fl: 0, flv: 0, ucc: 0, carte: 0, lv: 0, punti: 0 });
+  for (const p of P) { const S = p.resoconto.st;
+    for (const g of p.resoconto.giocatori) { const x = F[g.fazione]; if (!x) continue;
+      x.partite++; if (g.posizione === 1) x.vitt++; x.pos += g.posizione; x.fama += g.fama; x.punti += g.totale; x.lv += g.livello;
+      const f = S.fama[g.id]; x.fa += f.attacco; x.fc += f.carta; x.fl += f.lago; x.flv += f.livello;
+      x.ucc += S.uccisioni[g.id].attacco + S.uccisioni[g.id].carta; x.carte += S.carte.filter(c => c.p === g.id).length; } }
+  const righe = R.FAZIONI.map(z => { const x = F[z];
+    return `<tr><td><span class="pall" style="background:${COL_FZ[z]}"></span><b>${R.NOME_FAZ[z]}</b></td><td>${x.partite}</td><td>${x.vitt}</td><td>${pc(x.vitt, x.partite)}</td><td>${md(x.pos, x.partite)}</td><td>${md(x.punti, x.partite)}</td><td>${md(x.fama, x.partite)}</td><td>${md(x.fa, x.partite)} / ${md(x.fc, x.partite)} / ${md(x.fl, x.partite)} / ${md(x.flv, x.partite)}</td><td>${md(x.ucc, x.partite)}</td><td>${md(x.carte, x.partite)}</td><td>${md(x.lv, x.partite)}</td></tr>`; }).join('');
+  const famaTorta = R.FAZIONI.map(z => ({ l: R.NOME_FAZ[z], v: F[z].fama, c: COL_FZ[z] }));
+  return `<h2>Le Facce</h2>
+    <div class="duo">${blocco('Vittorie per Faccia', torta(R.FAZIONI.map(z => ({ l: R.NOME_FAZ[z], v: F[z].vitt, c: COL_FZ[z] })), { vuoto: 'Ancora nessuna vittoria.' }))}
+    ${blocco('Fama raccolta per Faccia', torta(famaTorta))}</div>
+    <div class="blocco scorri"><table><tr><th>Faccia</th><th>Partite</th><th>Vittorie</th><th>% vittorie</th><th>Posizione media</th><th>Punti medi</th><th>Fama media</th><th>Fama: attacco / carta / Lago / livello</th><th>Uccisioni</th><th>Carte giocate</th><th>Livello finale</th></tr>${righe}</table>
+    <div class="nota">Uccisioni, carte e livello sono medie per partita.</div></div>`;
+}
+
+/* ---------------- carte ---------------- */
+function carte(P) {
+  const C = {}; for (const n in R.CARTE) C[n] = { giocate: 0, partite: new Set(), libera: 0, propria: 0, reazione: 0, attN: 0, attOk: 0, difN: 0, difOk: 0, ucc: 0, vincePartita: 0, giocatoriPartite: 0, x: 0, xN: 0 };
+  let tot = 0;
+  for (const p of P) { const S = p.resoconto.st, vince = new Set(p.resoconto.giocatori.filter(g => g.posizione === 1).map(g => g.id)), visti = {};
+    for (const c of S.carte) { const x = C[c.n]; tot++;
+      x.giocate++; x[c.modo]++; x.ucc += c.uccisioni || 0; if (c.x) { x.x += c.x; x.xN++; }
+      if (c.lato === 'att' && c.esitoAtt) { x.attN++; if (c.esitoAtt === 'vinto') x.attOk++; }
+      if (c.lato === 'dif' && c.esitoAtt) { x.difN++; if (c.esitoAtt !== 'vinto') x.difOk++; }
+      const k = c.n + ':' + c.p; if (!visti[k]) { visti[k] = 1; x.giocatoriPartite++; if (vince.has(c.p)) x.vincePartita++; } } }
+  const modi = { libera: 0, propria: 0, reazione: 0 }; Object.values(C).forEach(x => { modi.libera += x.libera; modi.propria += x.propria; modi.reazione += x.reazione; });
+  const tipi = { aggeggio: 0, racconto: 0 }; for (const n in C) tipi[R.CARTE[n].tipo] += C[n].giocate;
+  const ordinate = Object.keys(C).sort((a, b) => C[b].giocate - C[a].giocate);
+  const mx = Math.max(1, ...ordinate.map(n => C[n].giocate));
+  const righe = ordinate.map(n => { const x = C[n], K = R.CARTE[n];
+    return `<tr><td><img class="min" src="assets/carte/${n}.jpg" alt="">${esc(K.nome)}</td><td class="t fz">${K.fz ? `<span class="pall" style="background:${COL_FZ[K.fz]}"></span>${R.NOME_FAZ[K.fz]}` : 'Comune'}</td><td class="t">${K.tipo}${K.trig ? ' · ' + K.trig : ''}</td>
+      <td>${x.giocate}<span class="barra" style="width:${Math.round(50 * x.giocate / mx)}px"></span></td><td>${md(x.giocate, P.length, 2)}</td>
+      <td>${pc(x.libera, x.giocate)} / ${pc(x.propria, x.giocate)} / ${pc(x.reazione, x.giocate)}</td>
+      <td>${x.attN ? `${pc(x.attOk, x.attN)} <span class="tag">${x.attN}</span>` : '—'}</td><td>${x.difN ? `${pc(x.difOk, x.difN)} <span class="tag">${x.difN}</span>` : '—'}</td>
+      <td>${x.ucc}</td><td>${x.xN ? md(x.x, x.xN) : '—'}</td><td>${pc(x.vincePartita, x.giocatoriPartite)}</td></tr>`; }).join('');
+  return `<h2>Le carte</h2><div class="tiles">${tile(tot, 'carte giocate')}${tile(md(tot, P.length), 'carte a partita')}${tile(Object.keys(C).filter(n => !C[n].giocate).length, 'carte mai giocate')}</div>
+    <div class="duo">${blocco('Quando vengono giocate', torta([{ l: 'libere nel proprio turno', v: modi.libera }, { l: 'dentro una propria azione', v: modi.propria }, { l: 'come reazione nel turno altrui', v: modi.reazione }]))}
+    ${blocco('Aggeggi e Racconti', torta([{ l: 'Aggeggio', v: tipi.aggeggio }, { l: 'Racconto', v: tipi.racconto }]))}</div>
+    <div class="blocco scorri"><table><tr><th>Carta</th><th>Faccia</th><th>Tipo</th><th>Giocate</th><th>A partita</th><th>Libera / propria / reazione</th><th>Riuscita in attacco</th><th>Riuscita in difesa</th><th>Uccisioni</th><th>Boost medio</th><th>Chi la gioca vince</th></tr>${righe}</table>
+    <div class="nota">Riuscita in attacco: giocata da chi attacca, quanti di quegli attacchi hanno ucciso. Riuscita in difesa: giocata da chi difende, quante volte il dado è sopravvissuto. Il numerino è su quante giocate si calcola. "Chi la gioca vince": dei giocatori che l'hanno giocata almeno una volta in una partita, quanti l'hanno vinta.</div></div>`;
+}
+
+/* ---------------- combattimento e movimento ---------------- */
+function combattimento(P) {
+  const es = { vinto: 0, perso: 0, annullato: 0, nullo: 0 }, dis = {}, mov = { piano: 0, salita: 0, discesa: 0, falliti: 0 }; let gratis = 0, forza = 0, val = 0, nF = 0, salitaMorti = 0;
+  for (const p of P) { const S = p.resoconto.st;
+    for (const a of S.attacchi) { es[a.esito]++; if (a.gratis) gratis++;
+      if (a.aA != null && a.aD != null && (a.esito === 'vinto' || a.esito === 'perso')) { const k = a.aA - a.aD; const x = dis[k] = dis[k] || { n: 0, ok: 0 }; x.n++; if (a.esito === 'vinto') x.ok++; forza += a.forza; val += a.vD; nF++; } }
+    S.mov.forEach(m => { mov.piano += m.piano; mov.salita += m.salita; mov.discesa += m.discesa; mov.falliti += m.falliti; });
+    S.morti.forEach(m => salitaMorti += m.movimento); }
+  const totA = es.vinto + es.perso + es.annullato + es.nullo;
+  const nomeDis = k => k > 0 ? `dall'alto (+${k})` : k === 0 ? 'alla pari' : `dal basso (${k})`;
+  const righe = [2, 1, 0, -1, -2].filter(k => dis[k]).map(k => `<tr><td>${nomeDis(k)}</td><td>${dis[k].n}</td><td>${dis[k].ok}</td><td>${pc(dis[k].ok, dis[k].n)}</td></tr>`).join('');
+  return `<h2>Dadi: attacchi e movimenti</h2><div class="tiles">${tile(totA, 'attacchi')}${tile(md(totA, P.length), 'attacchi a partita')}${tile(pc(es.vinto, totA), 'attacchi che uccidono')}${tile(gratis, 'attacchi extra dalle carte')}${tile(nF ? md(forza, nF) + ' vs ' + md(val, nF) : '—', 'forza media contro valore del difensore')}</div>
+    <div class="duo">${blocco('Come finiscono gli attacchi', torta([{ l: 'uccide', v: es.vinto }, { l: 'non basta', v: es.perso }, { l: 'annullato da una carta', v: es.annullato }, { l: 'a vuoto (bersaglio sparito o protetto)', v: es.nullo }], { centro: totA, sotto: 'attacchi' }))}
+    ${blocco('Movimenti', torta([{ l: 'in piano', v: mov.piano }, { l: 'in salita', v: mov.salita }, { l: 'in discesa', v: mov.discesa }, { l: 'non riusciti', v: mov.falliti }]), `${salitaMorti} dadi morti salendo.`)}</div>
+    ${blocco('Attacchi per dislivello', `<div class="scorri"><table><tr><th>Attacco</th><th>Attacchi</th><th>Uccidono</th><th>%</th></tr>${righe}</table></div>`, 'Solo gli attacchi arrivati allo scontro (esclusi annullati e a vuoto).')}`;
+}
+
+/* ---------------- mappa ed eventi ---------------- */
+function mappa(P) {
+  const occ = {}; let totO = 0; const uAlt = [0, 0, 0]; const ev = {};
+  for (const p of P) { const S = p.resoconto.st;
+    for (const k in S.occupazione) { occ[k] = (occ[k] || 0) + S.occupazione[k]; totO += S.occupazione[k]; }
+    S.uccisioniAlt.forEach((x, i) => uAlt[i] += x);
+    for (const e of S.eventi) { const k = e.tipo + '_' + e.eff; const x = ev[k] = ev[k] || { n: 0, dadi: 0, morti: 0, delta: 0, ann: 0 }; x.n++; x.dadi += e.dadi; x.morti += e.morti; x.delta += e.delta; if (e.annullato) x.ann++; } }
+  // quanti tasselli di quel tipo ci sono: serve per leggere la presenza in proporzione
+  const quanti = {}; R.TASSELLI.forEach(t => { const k = t.tipo + '_' + t.alt; quanti[k] = (quanti[k] || 0) + 1; });
+  const mxO = Math.max(1, ...Object.keys(quanti).map(k => (occ[k] || 0) / quanti[k]));
+  const cella = k => { const x = occ[k] || 0, perT = x / quanti[k]; const a = 0.15 + 0.7 * perT / mxO;
+    return `<td class="c" style="background:rgba(57,135,229,${a.toFixed(2)})">${pc(x, totO)}<br><span style="font-size:11px;opacity:.85">${md(x, quanti[k] * P.length)} a tassello</span></td>`; };
+  const tabOcc = `<table class="calore"><tr><th>Terreno</th><th style="text-align:center">basso</th><th style="text-align:center">medio</th><th style="text-align:center">alto</th></tr>${['terra', 'fuoco', 'acqua'].map(t => `<tr><td>${NOME_T[t]} <span class="tag">${quanti[t + '_0']}/${quanti[t + '_1']}/${quanti[t + '_2']}</span></td>${[0, 1, 2].map(a => cella(t + '_' + a)).join('')}</tr>`).join('')}</table>`;
+  const righeEv = ['terra', 'fuoco', 'acqua'].flatMap(t => ['positivo', 'negativo', 'destino'].map(e => { const x = ev[t + '_' + e]; return x ? `<tr><td>${NOME_T[t]} ${e}</td><td>${x.n}</td><td>${md(x.dadi, x.n)}</td><td>${x.delta >= 0 ? '+' : ''}${md(x.delta, x.n)}</td><td>${x.morti}</td><td>${x.ann}</td></tr>` : ''; })).join('');
+  return `<h2>La mappa</h2>
+    <div class="duo">${blocco('Dove stanno i dadi', tabOcc, 'Presenza dei dadi in arena all\'inizio di ogni turno, per terreno e altezza. Il colore pesa quanti tasselli di quel tipo esistono (il numerino accanto al terreno: bassi/medi/alti).')}
+    ${blocco('Da che altezza si uccide', torta([{ l: 'attaccante in alto', v: uAlt[2] }, { l: 'attaccante a metà', v: uAlt[1] }, { l: 'attaccante in basso', v: uAlt[0] }], { vuoto: 'Ancora nessuna uccisione in attacco.' }))}</div>
+    ${blocco('Gli eventi', `<div class="scorri"><table><tr><th>Evento</th><th>Uscito</th><th>Dadi colpiti in media</th><th>Valore cambiato in media</th><th>Dadi eliminati</th><th>Annullati dalla Muraglia</th></tr>${righeEv}</table></div>`)}`;
+}
+
+/* ---------------- Boost e Gate ---------------- */
+function boost(P) {
+  let spesi = 0, carteB = 0, suCarta = 0, avv = 0, entrati = 0, rientri = 0, camp = 0, turni = 0; const strisce = [];
+  for (const p of P) for (const b of p.resoconto.st.boost) { spesi += b.puntiSpesi; carteB += b.carteBoost; suCarta += b.suCarta; avv += b.avversari; entrati += b.entrati; rientri += b.rientri; camp += b.campioni; turni += b.turni; strisce.push(...b.strisce); }
+  const fermi = strisce.reduce((s, x) => s + x, 0);
+  const lunghe = [1, 2, 3, 4].map(k => ({ l: k === 4 ? '4 turni o più' : k + (k === 1 ? ' turno' : ' turni'), v: strisce.filter(x => k === 4 ? x >= 4 : x === k).length }));
+  return `<h2>Boost e Gate</h2><div class="tiles">${tile(md(spesi, P.length), 'punti Boost spesi a partita')}${tile(md(carteB, P.length), 'carte con Boost a partita')}${tile(suCarta, 'dadi messi sopra una carta')}${tile(avv, 'volte che si spende il Boost avversario')}${tile(md(entrati, P.length), 'dadi entrati nel Boost a partita')}${tile(md(rientri, P.length), 'rientri dal Gate a partita')}${tile(md(camp, turni, 2), 'dadi fermi nel Boost a inizio turno (media)')}${tile(strisce.length ? md(fermi, strisce.length) : '—', 'turni consecutivi nel Boost (media)')}${tile(strisce.length ? Math.max(...strisce) : '—', 'record di turni fermo nel Boost')}</div>
+    ${blocco('Quanto resta fermo un dado nel Boost', torta(lunghe, { vuoto: 'Ancora nessun dado passato dal Boost.' }), 'Ogni volta che un dado entra nel Boost, quanti dei turni del suo giocatore ci resta prima di uscire.')}`;
+}
+
+/* ---------------- tempo ---------------- */
+function tempo(P) {
+  const round = {}; P.forEach(p => round[p.resoconto.round] = (round[p.resoconto.round] || 0) + 1);
+  const ms = P.map(p => p.fine - p.inizio);
+  // durata dei turni per giocatore: dall'inizio di un turno all'inizio del successivo
+  const T = {};
+  for (const p of P) { const ts = p.turni || [];
+    for (let i = 0; i < ts.length; i++) { const fine = i + 1 < ts.length ? ts[i + 1].t : p.fine; const g = p.resoconto.giocatori.find(x => x.id === ts[i].g); if (!g) continue;
+      const k = chiave(g.nome), x = T[k] = T[k] || { nome: g.nome, n: 0, ms: 0, max: 0 }; const d = fine - ts[i].t; x.n++; x.ms += d; x.max = Math.max(x.max, d); } }
+  const righe = Object.values(T).sort((a, b) => b.ms / b.n - a.ms / a.n).map(x => `<tr><td>${esc(x.nome)}</td><td>${x.n}</td><td>${durata(x.ms / x.n)}</td><td>${durata(x.max)}</td></tr>`).join('');
+  const dec = P.reduce((s, p) => s + p.resoconto.decisioni, 0);
+  return `<h2>Tempo</h2><div class="tiles">${tile(durata(Math.min(...ms)), 'partita più breve')}${tile(durata(Math.max(...ms)), 'partita più lunga')}${tile(md(dec, P.length, 0), 'decisioni a partita')}</div>
+    <div class="duo">${blocco('Quanti round dura una partita', torta(Object.keys(round).sort((a, b) => a - b).map(r => ({ l: r + ' round', v: round[r] }))))}
+    ${blocco('Durata dei turni per giocatore', righe ? `<div class="scorri"><table><tr><th>Giocatore</th><th>Turni</th><th>Medio</th><th>Più lungo</th></tr>${righe}</table></div>` : '<div class="nota">Ancora nessun dato.</div>', 'Dall\'inizio di un turno all\'inizio del successivo: comprende anche le reazioni degli altri.')}</div>`;
+}
+
+/* ---------------- elenco partite ---------------- */
+function elenco(P) {
+  return `<h2>Tutte le partite</h2><div class="nota">Clicca una partita per aprire tutti i suoi dati.</div>` + P.map(p => {
+    const Rr = p.resoconto, S = Rr.st, gs = Rr.giocatori.slice().sort((a, b) => a.posizione - b.posizione);
+    const vinc = gs.filter(g => g.posizione === 1);
+    const righe = gs.map(g => { const f = S.fama[g.id], m = S.morti[g.id], u = S.uccisioni[g.id], b = S.boost[g.id], mv = S.mov[g.id];
+      const att = S.attacchi.filter(a => a.p === g.id), ok = att.filter(a => a.esito === 'vinto').length;
+      return `<tr><td>${g.posizione}°</td><td class="t"><span class="pall" style="background:${COL_FZ[g.fazione]}"></span><b>${esc(g.nome)}</b> · ${R.NOME_FAZ[g.fazione]}</td><td><b>${g.totale}</b></td><td>${g.fama}</td><td>${f.attacco}/${f.carta}/${f.lago}/${f.livello}</td><td>${g.dadiInCampo}</td><td>${g.dadiFuori}</td><td>${g.livello}</td>
+        <td>${u.attacco + u.carta}</td><td>${m.attacco + m.carta + m.evento + m.movimento}</td><td>${ok}/${att.length}</td><td>${mv.piano + mv.salita + mv.discesa}</td><td>${S.carte.filter(c => c.p === g.id).length}</td><td>${b.puntiSpesi}</td><td>${b.rientri}</td><td>${S.azioniSprecate[g.id]}</td></tr>`; }).join('');
+    const nomeDi = id => esc((Rr.giocatori.find(g => g.id === id) || {}).nome || '?');
+    const cartine = S.carte.map(c => `<div title="${esc(R.CARTE[c.n].nome)} · ${nomeDi(c.p)} · round ${c.r}"><img src="assets/carte/${c.n}.jpg" alt=""><span>${nomeDi(c.p)} · R${c.r}</span>${c.esitoAtt ? `<span class="${c.lato === 'terzo' ? '' : (c.lato === 'att') === (c.esitoAtt === 'vinto') ? 'ok' : 'ko'}">${c.lato === 'att' ? 'attacco' : c.lato === 'dif' ? 'difesa' : 'altro'}: ${c.esitoAtt === 'vinto' ? 'uccide' : 'salvo'}</span>` : ''}${c.uccisioni ? `<span class="ok">${c.uccisioni} uccis.</span>` : ''}</div>`).join('');
+    const eventi = S.eventi.map(e => `<span class="tag">R${e.r} ${NOME_T[e.tipo]} ${e.eff}${e.tiro ? ' (' + e.tiro + ')' : ''}: ${e.dadi} ${e.dadi === 1 ? 'dado' : 'dadi'}${e.morti ? `, ${e.morti} eliminat${e.morti === 1 ? 'o' : 'i'}` : ''}${e.annullato ? ', annullato' : ''}</span>`).join(' ');
+    const es = { vinto: 0, perso: 0, annullato: 0, nullo: 0 }; S.attacchi.forEach(a => es[a.esito]++);
+    return `<details><summary><span class="num">#${p.n}</span><span>${dataIt(p.inizio)}</span><span class="vinc">${vinc.length > 1 ? 'Parità: ' : 'Vince '}${vinc.map(g => `<span style="color:${COL_FZ[g.fazione]}">${esc(g.nome)}</span>`).join(' e ')}</span>
+      <span class="tenue">${Rr.n} giocatori · ${Rr.round} round · ${durata(p.fine - p.inizio)} · regole ${Rr.v} · stanza ${esc(p.codice || '')}</span></summary>
+      <div class="dentro"><div class="scorri"><table><tr><th>Pos.</th><th>Giocatore</th><th>Totale</th><th>Fama</th><th>Fama att/carta/Lago/lv</th><th>Dadi in campo</th><th>Fuori</th><th>Livello</th><th>Uccisioni</th><th>Morti</th><th>Attacchi vinti</th><th>Movimenti</th><th>Carte</th><th>Boost speso</th><th>Rientri Gate</th><th>Azioni non usate</th></tr>${righe}</table></div>
+      <h3>Attacchi</h3><p>${S.attacchi.length} attacchi: ${es.vinto} uccidono, ${es.perso} non bastano, ${es.annullato} annullati, ${es.nullo} a vuoto.</p>
+      <h3>Eventi</h3><p>${eventi || '—'}</p>
+      <h3>Carte giocate, in ordine</h3><div class="cartine">${cartine || '<span class="nota">Nessuna carta giocata.</span>'}</div></div></details>`;
+  }).join('');
+}
+carica();
+</script>
+</body>
+</html>
