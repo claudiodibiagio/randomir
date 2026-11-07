@@ -1,0 +1,1079 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Randomir · Arena</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Londrina+Solid:wght@400;900&family=Alegreya:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --feltro:#3a1517; --feltro2:#2a0f11; --pietra:#26211e; --pietra2:#332c28; --bordo:#4a3f38;
+  --carta:#efe2c4; --inchiostro:#2b221d; --crema:#f3ead6; --tenue:#b9ab95; --oro:#d6a84f; --oro2:#f2cf7a;
+  --scintilla:#c2185b; --costrutto:#3e8e41; --impatto:#7044a8; --lancio:#d9a514; --destino:#1fb5a8;
+  --ok:#5fbf7f; --T:100px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{background:radial-gradient(ellipse at 40% 30%,#4a1c1f 0%,var(--feltro) 45%,var(--feltro2) 100%);color:var(--crema);font-family:Alegreya,Georgia,serif;font-size:15px;overflow:hidden}
+button{font-family:inherit}
+.titolo{font-family:'Londrina Solid',sans-serif;letter-spacing:.5px}
+.hidden{display:none!important}
+
+/* ---------- schermate iniziali ---------- */
+#home,#lobby{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:16px;overflow:auto}
+.scheda{background:linear-gradient(#f3e7cb,#e6d4ad);color:var(--inchiostro);border-radius:14px;padding:28px 30px;max-width:560px;width:100%;box-shadow:0 20px 60px #0009,inset 0 0 0 3px #b99a5e,inset 0 0 0 6px #efe2c4,inset 0 0 0 7px #8a6a35}
+.scheda h1{font-family:'Londrina Solid';font-weight:900;font-size:56px;margin:0;line-height:.9;color:#3b2a1c;text-align:center}
+.scheda h1 small{display:block;font-size:22px;font-weight:400;letter-spacing:6px;color:#8a6a35;margin-top:6px}
+.scheda h2{font-family:'Londrina Solid';font-size:24px;margin:22px 0 8px;color:#5a3d22}
+.scheda p{margin:6px 0}
+.riga{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.scheda input{font:inherit;font-size:17px;padding:8px 10px;border:2px solid #b99a5e;border-radius:8px;background:#fffaf0;color:var(--inchiostro);min-width:0}
+.scheda input.codice{text-transform:uppercase;letter-spacing:4px;width:120px;font-weight:700}
+.btn{font-family:'Londrina Solid';font-size:19px;padding:8px 16px;border-radius:9px;border:0;cursor:pointer;background:#6b3a1f;color:#fbe9c6;box-shadow:0 3px 0 #3a1d0e;transition:transform .08s}
+.btn:hover{filter:brightness(1.12)} .btn:active{transform:translateY(2px);box-shadow:0 1px 0 #3a1d0e}
+.btn.oro{background:linear-gradient(#e7bf62,#c4923a);color:#3a2410;box-shadow:0 3px 0 #7a5420}
+.btn.chiaro{background:#e6d4ad;color:#4a3420;box-shadow:0 3px 0 #a88a55}
+.btn.n{min-width:44px}
+.btn.n.on{background:#3a2410;color:var(--oro2)}
+.btn:disabled{opacity:.45;cursor:default}
+.nota{font-size:13px;color:#7a6243}
+.errore{color:#9d1f1f;font-weight:700;min-height:20px}
+.posti{list-style:none;padding:0;margin:10px 0}
+.posti li{padding:7px 10px;border-radius:8px;background:#fffaf0aa;margin:5px 0;display:flex;justify-content:space-between}
+.punto{display:inline-block;width:9px;height:9px;border-radius:50%;background:#bbb;margin-right:6px}
+.punto.on{background:#2f9e5a}
+.bigcode{font-family:'Londrina Solid';font-size:54px;letter-spacing:10px;text-align:center;color:#3b2a1c;margin:4px 0}
+.nomi-locali input{width:100%;margin:3px 0}
+.versione{font-family:'Londrina Solid';font-size:15px;background:#3a2410;color:var(--oro2);padding:3px 10px;border-radius:7px}
+.nomiNoti{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.nomiNoti:empty{display:none}
+.nomiNoti .etich{font-size:13px;color:#7a6243;width:100%}
+.nomiNoti button{font:inherit;font-size:14px;border:1.5px solid #b99a5e;background:#fffaf0;color:#4a3420;border-radius:14px;padding:3px 11px;cursor:pointer}
+.nomiNoti button:hover,.nomiNoti button.on{background:#6b3a1f;color:#fbe9c6;border-color:#6b3a1f}
+
+/* ---------- gioco ---------- */
+#gioco{position:fixed;inset:0;display:grid;grid-template-columns:minmax(0,1fr) 440px 290px;grid-template-rows:48px minmax(0,1fr)}
+#testa{grid-column:1/-1;display:flex;align-items:center;gap:16px;padding:0 14px;background:linear-gradient(#1d1714,#15100e);border-bottom:2px solid #5a4630;box-shadow:0 2px 10px #0008;z-index:5}
+#testa .marchio{font-family:'Londrina Solid';font-weight:900;font-size:26px;color:var(--oro2)}
+#testa .spazio{flex:1}
+#testa .info{font-size:14px;color:var(--tenue)} #testa .info b{color:var(--crema)}
+.link{color:var(--tenue);background:none;border:0;cursor:pointer;text-decoration:underline;font-size:13px}
+#apriRegistro{display:none}
+.simboli{display:flex;gap:12px;flex-wrap:wrap}
+.simbolo{display:flex;align-items:center;gap:3px;font-size:13px}
+.simbolo i{display:inline-block;width:11px;height:11px;border-radius:50%;border:1.5px solid currentColor}
+.simbolo i.on{background:currentColor}
+.terra{color:#9fc27a}.fuoco{color:#ff8a5a}.acqua{color:#6fb6e8}
+.ultimo{display:inline-block;background:#9d1f1f;color:#fff;border-radius:6px;padding:1px 8px;font-family:'Londrina Solid';font-size:16px}
+
+/* centro: avversari attorno alla mappa, mano sotto */
+#centro{display:grid;grid-template-columns:var(--lat) auto var(--lat);grid-template-rows:auto auto auto;grid-template-areas:". su ." "sx mappa dx" "mano mano mano";gap:10px;justify-content:center;align-content:start;padding:10px 12px;overflow:auto;--lat:172px}
+#avv-su{grid-area:su} #avv-sx{grid-area:sx} #avv-dx{grid-area:dx}
+#mappa{grid-area:mappa;width:calc(var(--T)*5);height:calc(var(--T)*5);display:grid;grid-template-columns:repeat(5,minmax(0,1fr));grid-template-rows:repeat(5,minmax(0,1fr));box-shadow:0 12px 34px #000b;border:3px solid #1a0b0c;border-radius:4px}
+#mano{grid-area:mano;display:flex;flex-wrap:nowrap;gap:8px;justify-content:center;min-height:60px;padding-top:6px}
+.tass{position:relative;overflow:hidden;outline:1px solid #2a0f1188;min-width:0;min-height:0}
+.tass .fondo{position:absolute;inset:0;background-size:cover;background-position:center;pointer-events:none}
+.tass .coord{position:absolute;right:3px;bottom:1px;font-size:calc(var(--T)*.11);color:#fff;opacity:.45;font-weight:700;text-shadow:0 1px 2px #000;pointer-events:none}
+.tass .lato{position:absolute;pointer-events:none}
+.tass.cliccabile{cursor:pointer}
+.tass.cliccabile::after{content:'';position:absolute;inset:6%;border:3px dashed var(--oro2);border-radius:8px;background:#f2cf7a22;animation:pulsa 1.2s ease-in-out infinite;pointer-events:none}
+@keyframes pulsa{50%{opacity:.45}}
+.dadoMappa{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:calc(var(--T)*.52);height:calc(var(--T)*.52);filter:drop-shadow(0 4px 4px #000b)}
+.dado{display:inline-block;position:relative}
+.dado svg{width:100%;height:100%;display:block}
+.dado.cliccabile{cursor:pointer}
+.dadoMappa.cliccabile{animation:salta 1s ease-in-out infinite}
+.dado.cliccabile::before{content:'';position:absolute;inset:-14%;border:3px solid var(--oro2);border-radius:28%;box-shadow:0 0 12px var(--oro2)}
+.dado.bersaglio::before{border-color:#ff6b5b;box-shadow:0 0 14px #ff6b5b}
+.dado.sel::before{content:'';position:absolute;inset:-16%;border:4px solid #fff;border-radius:28%;box-shadow:0 0 16px #fff}
+.dado.sel{animation:none}
+@keyframes salta{50%{transform:translate(-50%,-56%)}}
+.badge{position:absolute;right:-12%;top:-14%;background:#111;color:var(--oro2);border:1.5px solid var(--oro2);border-radius:10px;font-size:calc(var(--T)*.13);font-weight:700;padding:0 4px;line-height:1.3}
+.torre{position:absolute;left:-14%;top:-16%;font-size:calc(var(--T)*.16)}
+
+/* riquadri avversari */
+.avv{background:var(--pietra2);border:1px solid var(--bordo);border-radius:10px;padding:8px 10px;border-top:4px solid var(--c)}
+.avv.attivo{box-shadow:0 0 0 2px var(--oro),0 0 18px #d6a84f55}
+.avv .testa{display:flex;align-items:center;gap:8px}
+.avv .ritratto{width:44px;height:44px;border-radius:9px;background-size:cover;border:3px solid var(--c);flex:none}
+.avv .nome{font-family:'Londrina Solid';font-size:19px;color:var(--c);line-height:1}
+.avv .sotto{font-size:12px;color:var(--tenue)}
+.avv .stats{display:flex;flex-wrap:wrap;gap:4px 10px;font-size:13px;color:var(--tenue);margin:6px 0 4px}
+.avv .stats b{color:var(--crema)}
+.avv .fila{display:flex;align-items:center;gap:4px;flex-wrap:wrap;font-size:12px;color:var(--tenue);margin-top:4px}
+.avv .fila .dado{width:24px;height:24px}
+.miniSlot{display:flex;gap:5px;margin-top:6px}
+.miniSlot span{width:40px;height:40px;border-radius:5px;border:1.5px dashed #6e5d4c;display:flex;align-items:center;justify-content:center;position:relative;font-size:13px;color:#7d6c5a}
+.miniSlot span.chiuso{border-style:solid;background:#0006}
+.miniSlot img{width:100%;height:100%;border-radius:4px;cursor:zoom-in}
+.miniSlot .dado{position:absolute;width:18px;height:18px;right:-5px;bottom:-5px}
+#avv-su{justify-self:center;width:var(--lat)}
+#avv-sx,#avv-dx{align-self:center}
+
+/* colonna destra */
+#destra{background:linear-gradient(#211b18,#1a1513);border-left:2px solid #4a3a2c;overflow-y:auto;overflow-x:hidden;padding:10px 12px 30px;display:flex;flex-direction:column;gap:10px}
+.box{background:var(--pietra2);border:1px solid var(--bordo);border-radius:10px;padding:9px 11px}
+.box h3{margin:0 0 6px;font-family:'Londrina Solid';font-weight:400;font-size:17px;color:var(--oro);letter-spacing:.5px}
+#eventoBox{display:grid;grid-template-columns:96px 1fr;gap:12px;align-items:center}
+#eventoBox img{width:96px;height:96px;border-radius:8px;cursor:zoom-in;box-shadow:0 4px 10px #0009}
+#eventoBox .vuoto{width:96px;height:96px;border-radius:8px;background:url(assets/dorsi/evento.jpg) center/cover;opacity:.5}
+#eventoBox .round{font-family:'Londrina Solid';font-size:30px;color:var(--oro2);line-height:1}
+#eventoBox .piccolo{font-size:13px;color:var(--tenue);margin-top:4px}
+.fama .riga{display:grid;grid-template-columns:30px 1fr auto;gap:8px;align-items:center;margin:5px 0}
+.fama .r{width:30px;height:30px;border-radius:7px;background-size:cover;border:2px solid var(--c)}
+.fama .n{font-family:'Londrina Solid';font-size:18px;color:var(--c);display:flex;justify-content:space-between}
+.fama .n small{font-family:Alegreya;font-size:12px;color:var(--tenue)}
+.fama .barra{height:6px;border-radius:3px;background:#0005;margin-top:2px;overflow:hidden}
+.fama .barra i{display:block;height:100%;background:var(--c)}
+.fama .pt{font-family:'Londrina Solid';font-size:28px;color:var(--crema);min-width:36px;text-align:right}
+.catena .voce{display:grid;grid-template-columns:22px 92px 1fr;gap:10px;align-items:center;margin:6px 0}
+.catena .voce img{width:92px;height:92px;border-radius:7px;cursor:zoom-in;box-shadow:0 3px 8px #0009}
+.catena .num{font-family:'Londrina Solid';color:var(--oro);font-size:20px}
+.catena .chi{font-size:14px} .catena .chi b{font-family:'Londrina Solid';font-size:17px}
+.catena .vuota{font-size:13px;color:var(--tenue);font-style:italic}
+#domanda{border:2px solid var(--oro);background:linear-gradient(#3b2f22,#2b231b)}
+#domanda.altrui{border-color:var(--bordo);background:var(--pietra2)}
+#domanda .chi{font-family:'Londrina Solid';font-size:20px}
+#domanda .testo{margin:3px 0 8px;line-height:1.3}
+#domanda .bottoni{display:flex;flex-wrap:wrap;gap:6px}
+#domanda .btn{font-size:16px;padding:6px 11px}
+.aiuto{font-size:13px;color:var(--tenue);margin-top:6px;font-style:italic}
+.dadiOpz{display:inline-flex;gap:3px;vertical-align:middle;margin-left:4px}
+.dadiOpz .dado{width:22px;height:22px}
+
+/* plancia fatta da noi */
+.plancia{display:flex;flex-direction:column;gap:8px}
+.livelli{display:grid;grid-template-columns:repeat(5,1fr);gap:4px}
+.livelli div{background:#0004;border:1px solid #5a4a3a;border-radius:7px;padding:4px 3px;text-align:center;font-size:11px;line-height:1.15;color:var(--tenue);min-height:48px}
+.livelli div b{display:block;font-family:'Londrina Solid';font-size:16px;color:var(--crema);font-weight:400}
+.livelli div.fatto{border-color:#8a6a35;color:#d9c49c}
+.livelli div.ora{background:linear-gradient(#e7bf62,#c4923a);color:#3a2410;border-color:#fff3}
+.livelli div.ora b{color:#3a2410}
+.spazi{display:grid;grid-template-columns:44px minmax(0,1fr) 44px;gap:8px;align-items:center}
+.pila{text-align:center;font-size:11px;color:var(--tenue)}
+.pila .mz{width:42px;height:42px;border-radius:6px;background-size:cover;margin:0 auto 2px;box-shadow:0 2px 6px #000a;display:flex;align-items:center;justify-content:center;font-family:'Londrina Solid';font-size:19px;color:#fff;text-shadow:0 1px 3px #000}
+.pila .sc{background:#0005;border:1.5px dashed #6e5d4c}
+.slot3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.slot{aspect-ratio:1;border-radius:8px;border:2px dashed #6e5d4c;display:flex;align-items:center;justify-content:center;position:relative;font-size:12px;color:#7d6c5a;text-align:center}
+.slot.chiuso{border-style:solid;background:#0006;color:#8a7a66}
+.slot img{width:100%;height:100%;border-radius:6px;cursor:zoom-in;box-shadow:0 3px 8px #000a}
+.slot .dado{position:absolute;width:34%;right:-6%;bottom:-6%}
+.dadiZona{display:grid;grid-template-columns:minmax(0,1fr) 112px;gap:8px}
+.zonaDadi{background:#0004;border:1px solid #5a4a3a;border-radius:8px;padding:6px 8px;min-height:62px}
+.zonaDadi .et{font-family:'Londrina Solid';font-size:14px;color:var(--oro);letter-spacing:1px}
+.zonaDadi .dd{display:flex;gap:7px;margin-top:4px;flex-wrap:wrap}
+.zonaDadi .dado{width:34px;height:34px}
+.lancio{display:flex;justify-content:center;gap:18px;margin:6px 0 10px}
+.lancio .uno{display:flex;flex-direction:column;align-items:center;gap:6px}
+.lancio .dado{width:62px;height:62px}
+.lancio .scelta{display:flex;border-radius:7px;overflow:hidden;border:1.5px solid #8a6a35}
+.lancio .scelta button{border:0;padding:4px 8px;font:inherit;font-size:13px;background:#2b231b;color:var(--tenue);cursor:pointer}
+.lancio .scelta button.on{background:var(--oro);color:#3a2410;font-weight:700}
+.lancio .scelta button:disabled{cursor:default}
+
+.carta{position:relative;width:var(--lcarta,108px);aspect-ratio:1;border-radius:8px;overflow:hidden;box-shadow:0 3px 8px #000a;cursor:zoom-in;flex:none;transition:transform .12s}
+.carta img{width:100%;height:100%;display:block}
+.carta:hover{transform:translateY(-6px)}
+.carta.cliccabile{cursor:pointer;outline:3px solid var(--oro2);box-shadow:0 0 14px var(--oro2)}
+.carta.scelta{outline:3px solid #ff6b5b;opacity:.6}
+
+/* cronaca: fasi del turno e ultima cosa successa */
+.fasi{display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin-bottom:8px}
+.fasi .chi{font-family:'Londrina Solid';font-size:18px;width:100%;margin-bottom:2px}
+.fasi span.f{font-family:'Londrina Solid';font-size:15px;padding:3px 10px;border-radius:14px;background:#0005;color:var(--tenue);border:1px solid #5a4a3a}
+.fasi span.f.ora{background:linear-gradient(#e7bf62,#c4923a);color:#3a2410;border-color:#fff3;box-shadow:0 0 10px #d6a84f88}
+.fasi span.f.fatta{color:#d9c49c;border-color:#8a6a35}
+.fasi i{color:#6e5d4c;font-style:normal}
+.ultima{display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:center;padding:8px;border-radius:9px;background:#0003;border-left:4px solid var(--c,#d6a84f)}
+.ultima.nuova{animation:lampo 1.2s ease-out}
+@keyframes lampo{0%{background:#f2cf7a55}100%{background:#0003}}
+.ultima img{width:84px;height:84px;border-radius:7px;cursor:zoom-in;box-shadow:0 3px 8px #0009}
+.ultima .tit{font-family:'Londrina Solid';font-size:20px;line-height:1.1}
+.ultima .sub{font-size:13px;color:var(--tenue);margin-top:3px}
+.ultima .icona{font-size:34px;width:84px;text-align:center}
+.prima{font-size:13px;color:var(--tenue);padding:3px 2px;border-bottom:1px solid #ffffff0d}
+.prima b{color:var(--crema);font-weight:400}
+/* il conto dell'attacco */
+.conto{background:linear-gradient(#3b1f1f,#2a1717);border:2px solid #c0504d;border-radius:10px;padding:10px 12px;margin:4px 0 8px}
+.conto .titAtt{font-family:'Londrina Solid';font-size:26px;color:#ff8a7e;letter-spacing:1px;display:flex;justify-content:space-between;align-items:center}
+.conto .duello{display:grid;grid-template-columns:auto 1fr auto 1fr auto;gap:8px;align-items:center;margin:6px 0}
+.conto .duello .dado{width:52px;height:52px}
+.conto .duello .vs{font-family:'Londrina Solid';font-size:24px;color:#ff8a7e;text-align:center}
+.conto .duello .nm{font-size:13px;line-height:1.2}
+.conto .voci{font-size:14px;margin:6px 0}
+.conto .voci div{display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px dashed #ffffff18}
+.conto .voci .piu{color:#7fd39a}.conto .voci .meno{color:#f08a7e}
+.conto .totale{display:flex;justify-content:space-between;align-items:baseline;font-family:'Londrina Solid';font-size:24px;margin-top:4px}
+.conto .totale b{font-size:34px;color:var(--oro2)}
+.esitoAtt{font-family:'Londrina Solid';font-size:20px;padding:2px 12px;border-radius:8px}
+.esitoAtt.si{background:#2f7a3f;color:#fff}.esitoAtt.no{background:#5a4a3a;color:#fff}.esitoAtt.prev{background:#0006;color:var(--oro2)}
+/* conferma prima di giocare una carta */
+.confCarta{background:linear-gradient(#f3e7cb,#e2cfa6);color:var(--inchiostro);border-radius:14px;padding:16px;max-width:520px;width:100%;text-align:center;box-shadow:0 20px 60px #000c}
+.confCarta img{width:min(440px,60vh);border-radius:12px;box-shadow:0 8px 20px #0007}
+.confCarta .riga{justify-content:center;margin-top:12px}
+.confCarta .btn{font-size:22px;padding:8px 26px}
+/* da piazzare, fase finale */
+.zonaDadi.attesa{border-color:#d6a84f;background:#d6a84f18}
+.dado.sel2::before{content:'';position:absolute;inset:-16%;border:4px solid #fff;border-radius:28%;box-shadow:0 0 16px #fff}
+.daPiazzare{display:flex;align-items:center;gap:10px;margin:4px 0 8px}
+.daPiazzare .dado{width:46px;height:46px}
+.fin{display:flex;flex-direction:column;align-items:center;gap:5px}
+.fin .dado{width:40px;height:40px}
+
+/* registro */
+#colRegistro{background:#15100e;border-left:2px solid #4a3a2c;display:flex;flex-direction:column;min-height:0}
+#colRegistro h3{margin:10px 12px 6px;font-family:'Londrina Solid';font-weight:400;font-size:18px;color:var(--oro)}
+#registro{font-size:13px;line-height:1.35;overflow-y:auto;color:#d9ccb4;padding:0 12px 20px;flex:1;min-height:0}
+#registro div{padding:2px 0;border-bottom:1px solid #ffffff08}
+#registro .round{color:var(--oro2);font-weight:700;margin-top:6px}
+#registro .priv{color:#9fd3c7;font-style:italic}
+/* specchietto delle regole: il 40% basso della colonna */
+#regole{flex:0 0 40%;min-height:0;display:flex;flex-direction:column;border-top:2px solid #5a4630;background:#1d1714}
+.regTesta{font-family:'Londrina Solid';font-size:18px;color:var(--oro);padding:8px 12px 4px}
+.regTesta span{font-family:Alegreya;font-size:12px;font-style:italic;color:var(--tenue)}
+.schede{display:flex;flex-wrap:wrap;gap:3px;padding:0 8px 6px}
+.schede button{font-family:'Londrina Solid';font-size:14px;padding:3px 7px;border-radius:8px 8px 0 0;border:1px solid #5a4a3a;border-bottom-width:3px;background:#2b231b;color:var(--tenue);cursor:pointer}
+.schede button:hover{color:var(--crema);border-color:#8a6a35}
+.schede button.on{background:linear-gradient(#e7bf62,#c4923a);color:#3a2410;border-color:#fff3}
+#regCorpo{flex:1;min-height:0;overflow-y:auto;padding:4px 12px 16px;font-size:13px;line-height:1.4;color:#e6dac2}
+#regCorpo .fase{display:grid;grid-template-columns:74px 1fr;gap:8px;padding:5px 0;border-bottom:1px solid #ffffff0d}
+#regCorpo .fase>b{font-family:'Londrina Solid';font-weight:400;font-size:15px;color:var(--oro2);white-space:nowrap}
+#regCorpo .sim{display:grid;grid-template-columns:40px 1fr;gap:9px;align-items:center;padding:4px 0;border-bottom:1px solid #ffffff0d}
+#regCorpo .sim .ic{width:38px;height:38px;border-radius:8px;background:#efe2c4;display:flex;align-items:center;justify-content:center}
+#regCorpo .sim .ic img{max-width:30px;max-height:30px}
+#regCorpo .sim .ic.parola{font-family:'Londrina Solid';font-size:11px;color:#3a2410;text-align:center;line-height:1}
+#regCorpo h4{font-family:'Londrina Solid';font-weight:400;font-size:16px;color:var(--oro);margin:8px 0 3px}
+#regCorpo table{border-collapse:collapse;width:100%;font-size:12.5px;margin-bottom:4px}
+#regCorpo th,#regCorpo td{border:1px solid #4a3f38;padding:3px 4px;text-align:center}
+#regCorpo th{color:var(--oro);font-weight:400;font-family:'Londrina Solid';font-size:13px;background:#2b231b}
+#regCorpo td.piu{color:#7fd39a}#regCorpo td.meno{color:#f08a7e}
+#regCorpo ul,#regCorpo ol{margin:4px 0;padding-left:18px}
+#regCorpo li{margin:3px 0}
+#regCorpo .n{color:var(--tenue);font-size:12px;font-style:italic}
+
+#zoom{position:fixed;width:400px;aspect-ratio:1;border-radius:14px;box-shadow:0 20px 50px #000c;pointer-events:none;z-index:50;display:none}
+#zoom img{width:100%;height:100%;border-radius:14px}
+
+.overlay{position:fixed;inset:0;background:#120707cc;display:flex;align-items:center;justify-content:center;z-index:40;padding:16px;overflow:auto}
+.facce{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;max-width:980px}
+.faccia{background:linear-gradient(#f3e7cb,#e2cfa6);color:var(--inchiostro);border-radius:12px;padding:12px;text-align:center;border:4px solid;cursor:pointer;transition:transform .12s}
+.faccia:hover{transform:translateY(-4px)}
+.faccia.presa{opacity:.35;cursor:default;transform:none}
+.faccia img{width:100%;border-radius:8px}
+.faccia h4{font-family:'Londrina Solid';font-size:26px;margin:6px 0 2px}
+.faccia p{font-size:14px;margin:0}
+.fine table{border-collapse:collapse;margin:10px auto;font-size:16px}
+.fine td,.fine th{padding:6px 12px;border-bottom:1px solid #b99a5e;text-align:right}
+.fine td:first-child,.fine th:first-child{text-align:left}
+.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:#9d1f1f;color:#fff;padding:9px 16px;border-radius:9px;z-index:60;box-shadow:0 6px 20px #000a}
+.passaggio{font-family:'Londrina Solid';font-size:44px;color:var(--oro2);text-align:center}
+.banner{max-width:780px;width:100%;padding:22px 26px}
+.banner h1{font-size:40px!important;margin-bottom:4px!important}
+.banner .sott{text-align:center;color:#7a6243;margin:0 0 12px;font-size:16px}
+.banner .dd{display:inline-block;width:34px;height:34px;vertical-align:middle}
+.banner .dd.g{width:54px;height:54px}
+.banner .giro{display:flex;flex-wrap:wrap;gap:14px;justify-content:center;margin:8px 0}
+.banner .giro>div{display:flex;flex-direction:column;align-items:center;gap:3px;font-weight:700;min-width:80px}
+.banner .giro .vince{color:#2f7a3f}
+.banner .ordine{text-align:center;font-family:'Londrina Solid';font-size:24px;color:#3b2a1c;margin-top:10px}
+.banner .ev{display:grid;grid-template-columns:280px 1fr;gap:22px;align-items:start}
+.banner .ev img{width:280px;border-radius:12px;box-shadow:0 8px 20px #0007}
+.banner .ev .titEv{font-family:'Londrina Solid';font-size:32px;line-height:1.05}
+.banner .ev p{font-size:17px}
+.banner.grande{max-width:960px}
+.banner .tiro{display:grid;grid-template-columns:auto 1fr;gap:24px;align-items:center;margin:8px 0}
+.banner .tiro .dd.xl{width:120px;height:120px}
+.banner .tiro .cartaTiro{display:flex;align-items:center;gap:12px;font-size:17px}
+.banner .tiro .cartaTiro img{width:96px;height:96px;border-radius:9px;box-shadow:0 4px 12px #0006;flex:none}
+.banner .tiro .esito{font-size:19px;margin-top:10px;text-align:left}
+@media (max-width:820px){.banner .ev{grid-template-columns:1fr}.banner .ev img{width:200px}}
+.banner .righe{max-height:300px;overflow:auto;margin-top:8px}
+.banner .rd{display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid #b99a5e55;font-size:15px}
+.banner .rd .freccia{font-size:20px;color:#8a6a35}
+.banner .morto{color:#9d1f1f;font-weight:700}
+.banner .kill{display:grid;grid-template-columns:auto auto auto;gap:14px;align-items:center;justify-content:center;margin:10px 0}
+.banner .kill .vs{font-family:'Londrina Solid';font-size:26px;color:#9d1f1f}
+.banner .esito{text-align:center;font-size:17px}
+.banner .esito b{font-family:'Londrina Solid';font-size:22px}
+.banner .piede{display:flex;justify-content:center;align-items:center;gap:12px;margin-top:16px}
+.banner .ultimo{font-size:20px;padding:3px 12px}
+
+/* schermi meno larghi: il registro diventa un pannello a scomparsa */
+@media (max-width:1580px){
+  #gioco{grid-template-columns:minmax(0,1fr) 420px}
+  #apriRegistro{display:inline}
+  #colRegistro{position:fixed;right:0;top:48px;bottom:0;width:320px;z-index:30;box-shadow:-10px 0 30px #000a;transform:translateX(105%);transition:transform .2s}
+  #colRegistro.aperto{transform:none}
+}
+/* ancora più stretti: avversari tutti sopra la mappa */
+@media (max-width:1250px){
+  #centro{grid-template-columns:repeat(3,minmax(0,1fr));grid-template-areas:"sx su dx" "mappa mappa mappa" "mano mano mano";--lat:auto;align-items:start}
+  #mappa{justify-self:center}
+  #avv-sx,#avv-dx{align-self:start}
+  #avv-su{width:auto;justify-self:stretch}
+  .avv .stats{gap:2px 8px}
+}
+@media (max-width:950px){
+  body{overflow:auto}
+  #gioco{position:static;display:block}
+  #testa{position:sticky;top:0;height:48px}
+  #destra{border-left:0}
+  .facce{grid-template-columns:repeat(2,1fr)}
+}
+</style>
+
+</head>
+<body>
+
+<!-- ================= HOME ================= -->
+<div id="home">
+  <div class="scheda">
+    <div class="riga" style="justify-content:space-between;margin-bottom:10px"><span class="versione" id="versioneHome"></span><a class="btn chiaro" href="archivio.html" style="text-decoration:none;font-size:16px">📜 L'archivio delle partite</a></div>
+    <h1>Randomir<small>ARENA</small></h1>
+    <h2>Gioca online</h2>
+    <div class="riga"><input id="nome" placeholder="Il tuo nome" maxlength="20" style="flex:1"></div>
+    <div class="nomiNoti" id="nomiNoti"></div>
+    <p class="nota" style="margin-top:10px">Crea una partita e manda il codice ai tuoi amici:</p>
+    <div class="riga">
+      <span>Giocatori:</span>
+      <button class="btn chiaro n on" data-n="2">2</button><button class="btn chiaro n" data-n="3">3</button><button class="btn chiaro n" data-n="4">4</button>
+      <span style="flex:1"></span>
+      <button class="btn oro" id="crea">Crea partita</button>
+    </div>
+    <p class="nota" style="margin-top:12px">Oppure entra in una partita con il codice:</p>
+    <div class="riga"><input id="codice" class="codice" maxlength="6" placeholder="CODICE"><button class="btn" id="entra">Entra</button></div>
+    <div class="errore" id="errHome"></div>
+    <h2>Tavolo locale</h2>
+    <p class="nota">Tutti sullo stesso schermo, a turno. Utile per provare le regole da soli.</p>
+    <div class="nomi-locali" id="nomiLocali"></div>
+    <div class="riga" style="margin-top:6px">
+      <button class="btn chiaro n" data-ln="2">2</button><button class="btn chiaro n on" data-ln="3">3</button><button class="btn chiaro n" data-ln="4">4</button>
+      <span style="flex:1"></span>
+      <button class="btn chiaro" id="riprendiLocale">Riprendi</button>
+      <button class="btn" id="locale">Inizia</button>
+    </div>
+  </div>
+</div>
+
+<!-- ================= LOBBY ================= -->
+<div id="lobby" class="hidden">
+  <div class="scheda">
+    <h1 style="font-size:40px">Sala d'attesa</h1>
+    <p style="text-align:center;margin-top:12px">Codice della partita</p>
+    <div class="bigcode" id="lCodice"></div>
+    <p class="nota" style="text-align:center">Manda ai tuoi amici questo indirizzo: <b id="lLink"></b> <button class="link" id="copia">copia</button></p>
+    <ul class="posti" id="lPosti"></ul>
+    <div class="errore" id="errLobby"></div>
+    <div class="riga"><button class="link" id="esciLobby">esci</button><span style="flex:1"></span><button class="btn oro" id="avvia">Che la battaglia inizi!</button></div>
+    <p class="nota" id="lAttesa" style="text-align:right"></p>
+  </div>
+</div>
+
+<!-- ================= GIOCO ================= -->
+<div id="gioco" class="hidden">
+  <div id="testa">
+    <span class="marchio">Randomir</span>
+    <span class="spazio"></span>
+    <span class="info" id="stanza"></span>
+    <button class="link" id="apriRegistro">registro</button>
+    <a class="link" href="archivio.html" target="_blank">archivio</a>
+    <button class="link" id="menu">menu</button>
+  </div>
+  <div id="centro">
+    <div id="avv-su"></div>
+    <div id="avv-sx"></div>
+    <div id="mappa"></div>
+    <div id="avv-dx"></div>
+    <div id="mano"></div>
+  </div>
+  <div id="destra">
+    <div class="box" id="eventoBox"></div>
+    <div class="box fama" id="famaBox"></div>
+    <div class="box" id="cronaca"></div>
+    <div class="box catena hidden" id="catena"></div>
+    <div class="box" id="domanda"></div>
+    <div class="box" id="me"></div>
+  </div>
+  <div id="colRegistro"><h3>Registro</h3><div id="registro"></div>
+    <div id="regole"><div class="regTesta">Regole rapide <span>· clicca una scheda per leggerla</span></div><div class="schede" id="schede"></div><div id="regCorpo"></div></div>
+  </div>
+</div>
+
+<div id="zoom"><img alt=""></div>
+<div id="overlay" class="overlay hidden"></div>
+<div id="conferma" class="overlay hidden"></div>
+
+<script src="motore.js"></script>
+<script>
+'use strict';
+const R = window.Randomir;
+const $ = s => document.querySelector(s);
+const COL = { scintilla: '#c2185b', costrutto: '#3e8e41', impatto: '#7044a8', lancio: '#d9a514', destino: '#1fb5a8', null: '#8a7d6b' };
+const PIP = { scintilla: '#fff', costrutto: '#fff', impatto: '#fff', lancio: '#2b1d05', destino: '#fff', null: '#fff' };
+const DESCR = {
+  impatto: 'Pesante e granitica: si avvicina per fare più male, non ha paura degli scontri faccia a faccia.',
+  lancio: 'Veloce e scaltra: attacca a grandi distanze, letale e invisibile.',
+  scintilla: 'Intelligente e attenta: attinge all\'energia spirituale di Randomir.',
+  costrutto: 'Antica e potente: vive di posizionamenti e di schemi da costruire.',
+};
+const coloreDi = gid => V && V.giocatori[gid] ? COL[V.giocatori[gid].fazione] : '#888';
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const ls = { get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }, del(k) { try { localStorage.removeItem(k); } catch (e) {} } };
+
+/* ---------------- stato del client ---------------- */
+let modo = 'home';           // home | lobby | gioco
+let rete = null;             // {ws, codice, token, posto}
+let LOBBY = null;
+let V = null;                // vista corrente
+let sel = null;              // dado selezionato (mosse in due clic)
+let locale = null;           // partita sul tavolo locale
+let ultimoDecisoreLocale = 0;
+let mostraTutte = false;
+function selSet(id) { sel = id; }
+function selReset() { sel = null; }
+
+/* ---------------- dadi in SVG ---------------- */
+const PUNTI = { 1: [[50, 50]], 2: [[28, 28], [72, 72]], 3: [[26, 26], [50, 50], [74, 74]], 4: [[28, 28], [72, 28], [28, 72], [72, 72]], 5: [[26, 26], [74, 26], [50, 50], [26, 74], [74, 74]], 6: [[28, 24], [72, 24], [28, 50], [72, 50], [28, 76], [72, 76]] };
+function svgDado(v, fz) {
+  const c = COL[fz] || COL.null, p = PIP[fz] || '#fff';
+  const pts = (PUNTI[v] || []).map(([x, y]) => `<circle cx="${x}" cy="${y}" r="8.5" fill="${p}"/>`).join('');
+  const zero = v === 0 ? `<text x="50" y="64" text-anchor="middle" font-size="42" font-family="Londrina Solid" fill="${p}" opacity=".8">0</text>` : '';
+  return `<svg viewBox="0 0 100 100"><rect x="4" y="6" width="92" height="92" rx="20" fill="#000" opacity=".35"/><rect x="2" y="2" width="92" height="92" rx="20" fill="${c}" stroke="#0006" stroke-width="2"/><rect x="8" y="6" width="80" height="34" rx="14" fill="#fff" opacity=".13"/>${pts}${zero}</svg>`;
+}
+function htmlDado(d, cls, extra) {
+  const fz = V.giocatori[d.prop].fazione;
+  return `<span class="dado ${cls || ''}" data-dado="${d.id}" title="${esc(V.giocatori[d.prop].nome)} · ${d.val}">${svgDado(d.val, fz)}${extra || ''}</span>`;
+}
+
+/* ---------------- opzioni della decisione corrente ---------------- */
+function mia() { return V && V.richiesta && !V.richiesta.altrui ? V.richiesta : null; }
+function scegli(i) {
+  const Rq = mia(); if (!Rq) return;
+  sel = null; mostraTutte = false; chiudiConferma();
+  if (locale) {
+    try { R.rispondi(locale, Rq.gioc, i); } catch (e) { toast(e.message); }
+    salvaLocale(); aggiornaLocale(); return;
+  }
+  rete.ws.send(JSON.stringify({ t: 'mossa', n: Rq.n, i }));
+}
+// se tutte le mosse in due clic partono dallo stesso dado, è già selezionato
+function selEff() {
+  if (sel !== null) return sel;
+  const Rq = mia(); if (!Rq) return null;
+  const src = new Set(Rq.opzioni.filter(o => o.dado != null && (o.tassello != null || o.bersaglio != null)).map(o => o.dado));
+  if (src.size === 1) { const id = [...src][0], d = trova(id); if (d && d.stato === 'mappa') return id; }
+  return null;
+}
+function analizza() {
+  const sel = selEff();
+  const Rq = mia(); const A = { dadi: new Set(), bersagli: new Set(), tasselli: new Set(), carte: new Set(), bottoni: [] };
+  if (!Rq) return A;
+  const ops = Rq.opzioni;
+  const fuoriMappa = id => { const d = trova(id); return !d || d.stato !== 'mappa'; };
+  for (const o of ops) {
+    const due = o.dado != null && (o.tassello != null || o.bersaglio != null);
+    if (due) {
+      const unico = ops.every(x => x.dado === o.dado);
+      if (unico && fuoriMappa(o.dado)) { A.tasselli.add(o.tassello); continue; }     // piazzamento, Gate
+      if (sel === null) A.dadi.add(o.dado);
+      else if (o.dado === sel) { if (o.tassello != null) A.tasselli.add(o.tassello); else A.bersagli.add(o.bersaglio); }
+      continue;
+    }
+    if (o.dado != null) { A.dadi.add(o.dado); continue; }
+    if (o.tassello != null) { A.tasselli.add(o.tassello); continue; }
+    if (o.carta != null) { A.carte.add(o.carta); if (o.tipo === 'carta') A.bottoni.push(o); continue; }
+    if (o.dado == null) A.bottoni.push(o);
+  }
+  if (Rq.tipo === 'costruzione') A.bottoni = ops.filter(o => o.tassello == null && o.carta == null);
+  return A;
+}
+function trova(id) { for (const g of V.giocatori) for (const d of g.dadi) if (d.id === id) return d; return null; }
+function clicDado(id) {
+  const Rq = mia(); if (!Rq) return; const sel = selEff();
+  const ops = Rq.opzioni;
+  if (sel !== null) {
+    const att = ops.find(o => o.dado === sel && o.bersaglio === id); if (att) return scegli(att.i);
+    if (id === sel) { selReset(); return disegna(); }
+  }
+  const dir = ops.filter(o => o.dado === id && o.tassello == null && o.bersaglio == null);
+  if (dir.length === 1) return scegli(dir[0].i);
+  if (ops.some(o => o.dado === id && (o.tassello != null || o.bersaglio != null))) { selSet(id); return disegna(); }
+}
+function clicTassello(i) {
+  const Rq = mia(); if (!Rq) return; const sel = selEff();
+  const ops = Rq.opzioni;
+  let o = sel !== null ? ops.find(x => x.dado === sel && x.tassello === i) : null;
+  if (!o) o = ops.find(x => x.tassello === i && (x.dado == null || ops.every(y => y.dado === x.dado)));
+  if (!o && sel !== null) { const top = V.mappa[i].pila.slice(-1)[0]; if (top != null) return clicDado(top); }
+  if (o) scegli(o.i);
+}
+function clicCarta(uid) {
+  const Rq = mia(); if (!Rq) return;
+  const o = Rq.opzioni.find(x => x.carta === uid); if (!o) return;
+  if (o.tipo === 'carta') return apriConferma(o);     // giocare una carta: prima la si guarda in grande
+  scegli(o.i);
+}
+// conferma prima di giocare: dopo "Gioca" non si torna indietro
+function apriConferma(o) {
+  const g = V.giocatori[mia().gioc], c = (Array.isArray(g.mano) ? g.mano : []).find(x => x.uid === o.carta); if (!c) return;
+  const K = R.CARTE[c.n];
+  $('#conferma').innerHTML = `<div class="confCarta"><img src="assets/carte/${c.n}.jpg" alt="">
+    <h2 style="font-family:'Londrina Solid';margin:10px 0 2px;font-size:28px">${esc(K.nome)}</h2>
+    <div class="nota">${K.tipo}${K.trig ? ' · ' + K.trig : ''} · costo ${K.costo} di Boost${K.B ? ' · usa il Boost' : ''}. Dopo "Gioca" non si torna indietro.</div>
+    <div class="riga"><button class="btn chiaro" id="annullaCarta">Annulla</button><button class="btn oro" data-opt="${o.i}">Gioca</button></div></div>`;
+  $('#conferma').classList.remove('hidden');
+}
+function chiudiConferma() { $('#conferma').classList.add('hidden'); $('#conferma').innerHTML = ''; }
+
+/* ---------------- disegno ---------------- */
+let T = 100;
+// chi sta guardando: online sei tu; sul tavolo locale è chi deve decidere
+function ioId() { return locale ? (mia() ? mia().gioc : ultimoDecisoreLocale) : V.io; }
+function mioLato() { const g = V.giocatori[ioId()]; return g && g.lato != null ? g.lato : 0; }
+// la mappa si ruota perché il tuo lato sia sempre in basso
+function logico(dr, dc, L) {
+  if (L === 0) return dr * 5 + dc;
+  if (L === 2) return (4 - dr) * 5 + (4 - dc);
+  if (L === 1) return dc * 5 + (4 - dr);        // ovest in basso: vista girata in senso antiorario
+  return (4 - dc) * 5 + dr;                     // est in basso: vista girata in senso orario
+}
+const ROT_TASS = ['0deg', '-90deg', '180deg', '90deg'];
+const relativo = lato => (lato - mioLato() + 4) % 4;   // 0 io (basso), 1 sinistra, 2 alto, 3 destra
+
+function misura() {
+  const c = $('#centro'); if (!c) return;
+  const stretto = innerWidth <= 1250;
+  const lat = stretto ? 0 : 172 * 2 + 20;
+  const hSu = stretto ? Math.max($('#avv-su').offsetHeight, $('#avv-sx').offsetHeight, $('#avv-dx').offsetHeight) : ($('#avv-su').offsetHeight || 0);
+  // la mano sta su una riga: le carte si rimpiccioliscono se sono tante
+  const nCarte = $('#mano').querySelectorAll('.carta').length;
+  const lc = Math.max(64, Math.min(116, Math.floor((c.clientWidth - 30 - 8 * Math.max(0, nCarte - 1)) / Math.max(1, nCarte))));
+  document.documentElement.style.setProperty('--lcarta', lc + 'px');
+  const hMano = lc + 24;
+  const w = c.clientWidth - 24 - lat;
+  const h = innerWidth <= 950 ? w : c.clientHeight - 20 - hSu - hMano - 30;
+  T = Math.max(52, Math.floor(Math.min(w, h) / 5));
+  document.documentElement.style.setProperty('--T', T + 'px');
+}
+function disegnaMappa(A) {
+  const L = mioLato(), sl = selEff();
+  const lati = {}; V.giocatori.forEach(g => { if (g.lato != null) R.LATI[g.lato].forEach(i => { (lati[i] = lati[i] || []).push(g); }); });
+  let h = '';
+  for (let dr = 0; dr < 5; dr++) for (let dc = 0; dc < 5; dc++) {
+    const t = V.mappa[logico(dr, dc, L)];
+    const cls = ['tass']; if (A.tasselli.has(t.i)) cls.push('cliccabile');
+    let inner = `<div class="fondo" style="background-image:url(assets/tasselli/${t.tipo}_${t.alt}.jpg);transform:rotate(${ROT_TASS[L]})"></div><span class="coord">${R.nomeT(t.i)}</span>`;
+    for (const g of lati[t.i] || []) {
+      const rel = relativo(g.lato), b = `background:${COL[g.fazione] || '#999'};opacity:.9`;
+      const st = rel === 0 ? `left:0;right:0;bottom:0;height:5px;${b}` : rel === 2 ? `left:0;right:0;top:0;height:5px;${b}` : rel === 1 ? `top:0;bottom:0;left:0;width:5px;${b}` : `top:0;bottom:0;right:0;width:5px;${b}`;
+      inner += `<span class="lato" style="${st}"></span>`;
+    }
+    if (t.pila.length) {
+      const top = trova(t.pila[t.pila.length - 1]);
+      const c = ['dadoMappa'];
+      if (top.id === sl) c.push('sel');
+      else if (A.bersagli.has(top.id)) c.push('cliccabile', 'bersaglio');
+      else if (A.dadi.has(top.id)) c.push('cliccabile');
+      const extra = (t.pila.length > 1 ? `<span class="badge" title="dadi coperti sotto">+${t.pila.length - 1}</span>` : '') + (top.torre ? '<span class="torre" title="vale come se fosse in alto">🗼</span>' : '');
+      inner += htmlDado(top, c.join(' '), extra);
+    }
+    h += `<div class="${cls.join(' ')}" data-tassello="${t.i}" title="${R.nomeT(t.i)} · ${t.tipo} ${R.NOME_ALT[t.alt]}">${inner}</div>`;
+  }
+  $('#mappa').innerHTML = h;
+}
+function nomeG(gid) { const g = V.giocatori[gid]; return `<span style="color:${COL[g.fazione] || '#ddd'};font-weight:700">${esc(g.nome)}</span>`; }
+function disegnaTesta() { $('#stanza').innerHTML = rete ? `stanza <b>${rete.codice}</b>` : 'tavolo locale'; }
+function disegnaEvento() {
+  const e = V.eventi.corrente, c = V.eventi.conteggio;
+  const pallini = k => [0, 1, 2].map(j => `<i class="${j < c[k] ? 'on' : ''}"></i>`).join('');
+  $('#eventoBox').innerHTML = (e ? `<img src="assets/eventi/${e.tipo}_${e.eff}.jpg" data-zoom="assets/eventi/${e.tipo}_${e.eff}.jpg" alt="evento">` : '<div class="vuoto"></div>') +
+    `<div><div class="round">${V.round ? 'Round ' + V.round : 'Preparazione'}</div>
+      ${V.ultimoRound && !V.finita ? '<div style="margin-top:6px"><span class="ultimo">ULTIMO ROUND</span></div>' : ''}
+      <div class="simboli" style="margin-top:8px"><span class="simbolo terra">terra ${pallini('terra')}</span><span class="simbolo fuoco">fuoco ${pallini('fuoco')}</span><span class="simbolo acqua">acqua ${pallini('acqua')}</span></div>
+      <div class="piccolo">${e ? `Evento: ${e.tipo} ${e.eff}${e.tiro ? ` (Dado Destino ${e.tiro})` : ''} · ` : ''}eventi nel mazzo: ${V.eventi.restanti}</div></div>`;
+}
+function disegnaFama() {
+  const turno = V.turno ? V.turno.gioc : null;
+  const righe = V.giocatori.slice().sort((a, b) => b.fama - a.fama || a.id - b.id).map(g => `<div class="riga" style="--c:${COL[g.fazione] || '#999'}">
+    <div class="r" style="background-image:${g.fazione ? `url(assets/facce/${g.fazione}.jpg)` : 'none'}"></div>
+    <div><div class="n"><span>${esc(g.nome)}${g.id === ioId() ? ' (tu)' : ''}${g.id === turno ? ' ◂' : ''}</span><small>livello ${g.livello}</small></div><div class="barra"><i style="width:${Math.min(100, g.fama / 40 * 100)}%"></i></div></div>
+    <div class="pt">${g.fama}</div></div>`).join('');
+  $('#famaBox').innerHTML = `<h3>Fama</h3>${righe}`;
+}
+function disegnaDomanda(A) {
+  const Rq = V.richiesta, box = $('#domanda');
+  if (V.finita) { box.className = 'box'; box.innerHTML = '<div class="chi">Partita finita</div>'; return; }
+  if (!Rq) { box.className = 'box altrui'; box.innerHTML = '<div class="testo">…</div>'; return; }
+  if (Rq.altrui) {
+    box.className = 'box altrui';
+    box.innerHTML = `<div class="chi">Tocca a ${nomeG(Rq.gioc)}</div><div class="testo">${esc(Rq.testo)}</div>`;
+    return;
+  }
+  box.className = 'box';
+  const chi = locale ? `Tocca a ${nomeG(Rq.gioc)}` : 'Tocca a te';
+  if (Rq.tipo === 'ingresso') { box.innerHTML = `<div class="chi">${chi}</div><div class="testo">Hai lanciato i tuoi Dadi Eroe: scegli qui sotto quali vanno in arena e quali nel Boost.</div>`; return; }
+  if (Rq.tipo === 'finale') { box.innerHTML = `<div class="chi">${chi}</div><div class="testo">Fase Finale: scegli sulla plancia quali dadi del Boost passano al Gate. Tornano a 6 e rientrano nel tuo prossimo turno; gli altri restano nel Boost.</div>`; return; }
+  let bot = A.bottoni.map(o => `<button class="btn ${o.tipo === 'passa' || o.tipo === 'fine' || o.tipo === 'rinuncia' ? 'chiaro' : 'oro'}" ${o.tipo === 'carta' ? `data-gioca="${o.i}"` : `data-opt="${o.i}"`}>${esc(o.txt)}</button>`).join('');
+  const spaziali = Rq.opzioni.length - A.bottoni.length;
+  let aiuto = '';
+  if (Rq.tipo === 'azione') aiuto = selEff() !== null ? 'Ora clicca una casella evidenziata per muovere, o un dado nemico per attaccare. Clicca di nuovo il dado per deselezionarlo.' : 'Clicca un tuo dado che salta per muoverlo o attaccare. Le carte giocabili in mano sono illuminate.';
+  else if (Rq.tipo === 'piazza' || Rq.tipo === 'gate') aiuto = 'Clicca una casella evidenziata sulla mappa.';
+  else if (Rq.tipo === 'scarto') aiuto = 'Clicca in mano la carta da scartare.';
+  else if (Rq.tipo === 'catena') aiuto = 'Puoi giocare una carta (illuminata in mano) oppure passare: se passi resti fuori da questa catena.';
+  else if (Rq.tipo === 'extra') aiuto = 'Clicca il dado da attaccare, oppure rinuncia.';
+  else if (spaziali) aiuto = 'Scegli sulla mappa, sulla plancia o in mano gli elementi illuminati.';
+  if (Rq.tipo === 'costruzione' && Rq.cartaN) aiuto = `<img src="assets/carte/${Rq.cartaN}.jpg" data-zoom="assets/carte/${Rq.cartaN}.jpg" style="width:70px;float:left;margin:0 8px 0 0;border-radius:6px">` + (spaziali ? 'Scegli gli elementi illuminati.' : '');
+  if (spaziali && Rq.tipo !== 'fazione') bot += `<button class="link" id="tutte">${mostraTutte ? 'nascondi elenco' : 'elenco delle scelte'}</button>`;
+  let elenco = '';
+  if (mostraTutte) elenco = '<div class="bottoni" style="margin-top:6px">' + Rq.opzioni.filter(o => !A.bottoni.includes(o)).map(o => `<button class="btn chiaro" data-opt="${o.i}">${esc(o.txt)}</button>`).join('') + '</div>';
+  let extraTop = '';
+  if (Rq.tipo === 'piazza' && Rq.dadoDaPiazzare != null) { const d = trova(Rq.dadoDaPiazzare); extraTop = `<div class="daPiazzare">${htmlDado(d, 'sel2')}<span>Stai piazzando questo dado: <b>${d.val}</b>. È evidenziato anche sulla tua plancia.</span></div>`; }
+  if (Rq.tipo === 'gate') { const d = trova(Rq.opzioni[0].dado); extraTop = `<div class="daPiazzare">${htmlDado(d, 'sel2')}<span>Rientra a 6.</span></div>`; }
+  box.innerHTML = `<div class="chi">${chi}</div><div class="testo">${esc(Rq.testo)}</div>${extraTop}<div class="bottoni">${bot}</div>${elenco}<div class="aiuto">${aiuto}</div><div style="clear:both"></div>`;
+}
+/* ---- cronaca: fasi del turno, ultima cosa successa, il conto dell'attacco ---- */
+const FASI = [['gate', 'Gate'], ['pesca', 'Pesca'], ['azione', 'Azione'], ['finale', 'Finale']];
+function htmlConto(c, vivo, esito) {
+  const fa = V.giocatori[c.pA], fd = V.giocatori[c.pD];
+  const voci = [`<div><span>valore del dado</span><span>${c.vA}</span></div>`].concat(c.voci.map(v => `<div><span>${esc(v.t)}</span><span class="${v.v >= 0 ? 'piu' : 'meno'}">${v.v >= 0 ? '+' : '−'}${Math.abs(v.v)}</span></div>`)).join('');
+  const E = esito ? { vinto: ['si', 'UCCIDE'], perso: ['no', 'NON BASTA'], annullato: ['no', 'ANNULLATO'], nullo: ['no', 'A VUOTO'] }[esito] : (c.vince ? ['prev', 'per ora vince'] : ['prev', 'per ora non basta']);
+  return `<div class="conto"><div class="titAtt"><span>⚔ ATTACCO${c.gratis ? ` <span style="font-size:15px;color:var(--tenue)">gratis · ${esc(c.origine || '')}</span>` : ''}</span><span class="esitoAtt ${E[0]}">${E[1]}</span></div>
+    <div class="duello">${htmlDado({ id: c.att, prop: c.pA, val: c.vA }, '')}<div class="nm"><b style="color:${COL[fa.fazione]}">${esc(fa.nome)}</b><br>attacca</div><div class="vs">contro</div><div class="nm" style="text-align:right"><b style="color:${COL[fd.fazione]}">${esc(fd.nome)}</b><br>difende</div>${htmlDado({ id: c.dif, prop: c.pD, val: c.vD }, '')}</div>
+    <div class="voci">${voci}</div>
+    <div class="totale"><span>Forza <b>${c.forza}</b></span><span>contro <b>${c.vD}</b></span></div></div>`;
+}
+let nCronaca = -1;
+function testoVoce(c) {
+  const g = V.giocatori[c.p], nm = g ? `<b style="color:${COL[g.fazione]}">${esc(g.nome)}</b>` : '';
+  if (c.tipo === 'carta') return { img: `assets/carte/${c.c}.jpg`, tit: `${nm} gioca <b>${esc(R.CARTE[c.c].nome)}</b>`, sub: [c.paga ? `paga ${c.paga} di Boost` : 'nessun costo', c.x && R.CARTE[c.c].B !== 'carta' ? `X = ${c.x}` : '', c.avv ? `${c.avv} presi dal Boost avversario` : ''].filter(Boolean).join(' · ') };
+  if (c.tipo === 'mossa') return { icona: '➜', tit: `${nm} muove un dado su ${R.nomeT(c.a)}`, sub: c.delta > 0 ? `scende: +${c.delta}` : c.delta < 0 ? `sale: −${-c.delta}` : 'in piano' };
+  if (c.tipo === 'gate') return { icona: '⛩', tit: `${nm}: Fase Gate`, sub: `${c.rientrati ? `${c.rientrati} dad${c.rientrati === 1 ? 'o rientra' : 'i rientrano'} a 6 · ` : ''}+${c.fama} Fama (${c.fama} dad${c.fama === 1 ? 'o' : 'i'} in arena)` };
+  if (c.tipo === 'finale') return { icona: '⏭', tit: `${nm}: Fase Finale`, sub: c.dadi ? `${c.dadi} dad${c.dadi === 1 ? 'o passa' : 'i passano'} dal Boost al Gate` : 'nessun dado al Gate' };
+  if (c.tipo === 'attacco') { const fa = V.giocatori[c.pA]; return { icona: '⚔', tit: `<b style="color:${COL[fa.fazione]}">${esc(fa.nome)}</b> attacca: ${c.forza} contro ${c.vD}`, sub: { vinto: 'uccide', perso: 'non basta', annullato: 'annullato', nullo: 'a vuoto' }[c.esito] }; }
+  return { icona: '•', tit: c.tipo, sub: '' };
+}
+function disegnaCronaca() {
+  const box = $('#cronaca');
+  let fasi = '';
+  if (V.turno && V.round) {
+    const k = FASI.findIndex(f => f[0] === V.turno.fase);
+    fasi = `<div class="fasi"><span class="chi">Turno di ${nomeG(V.turno.gioc)}</span>${FASI.map(([id, nome], j) => `<span class="f ${j === k ? 'ora' : j < k ? 'fatta' : ''}">${nome}${id === 'azione' && j === k ? ` · ${V.turno.slot}/3` : ''}</span>`).join('<i>›</i>')}</div>`;
+  } else fasi = `<div class="fasi"><span class="chi">Preparazione della battaglia</span></div>`;
+  const C = V.cronaca || [];
+  if (!C.length) { box.innerHTML = fasi + '<div class="aiuto" style="margin:0">Qui compare in chiaro tutto quello che succede: carte giocate, attacchi, mosse.</div>'; return; }
+  const ult = C[C.length - 1], nuova = ult.n !== nCronaca; nCronaca = ult.n;
+  let corpo;
+  if (ult.tipo === 'attacco') corpo = htmlConto(ult, false, ult.esito);
+  else { const t = testoVoce(ult), g = V.giocatori[ult.p];
+    corpo = `<div class="ultima ${nuova ? 'nuova' : ''}" style="--c:${g ? COL[g.fazione] : '#d6a84f'}">${t.img ? `<img src="${t.img}" data-zoom="${t.img}" alt="">` : `<div class="icona">${t.icona}</div>`}<div><div class="tit">${t.tit}</div><div class="sub">${t.sub}</div></div></div>`; }
+  const prima = C.slice(-3, -1).reverse().map(c => { const t = testoVoce(c); return `<div class="prima">${t.tit} <span>· ${t.sub}</span></div>`; }).join('');
+  box.innerHTML = fasi + corpo + prima;
+}
+function disegnaCatena() {
+  const box = $('#catena');
+  const cats = (V.catene || []).filter(c => c.stato === 'catena' || c.voci.length);
+  if (!cats.length) { box.classList.add('hidden'); return; }
+  box.classList.remove('hidden');
+  let h = '';
+  for (const c of cats) {
+    const a = c.azione; let tit = 'Carta giocata';
+    if (a && a.tipo === 'attacco') { const at = trova(a.att), df = trova(a.dif); tit = `Attacco: ${esc(V.giocatori[at.prop].nome)} (${at.val}) contro ${esc(V.giocatori[df.prop].nome)} (${df.val})`; }
+    if (a && a.tipo === 'movimento') tit = `Movimento verso ${R.nomeT(a.a)}`;
+    if (a && a.tipo === 'evento') tit = `Evento: ${a.e.tipo} ${a.e.eff}`;
+    if (a && a.tipo === 'attacco' && a.conto) { h += htmlConto(a.conto, true); if (!c.voci.length && c.stato !== 'catena') continue; h += `<h3>Carte giocate su questo attacco${c.stato === 'risolvi' ? ' · si risolvono' : ''}</h3>`; }
+    else h += `<h3>${tit}${c.stato === 'risolvi' ? ' · si risolve' : ''}</h3>`;
+    h += c.voci.map((v, k) => `<div class="voce"><span class="num">${k + 1}</span><img src="assets/carte/${v.n}.jpg" data-zoom="assets/carte/${v.n}.jpg"><span class="chi"><b style="color:${coloreDi(v.p)}">${esc(V.giocatori[v.p].nome)}</b><br>${esc(R.CARTE[v.n].nome)}</span></div>`).join('') || '<div class="vuota">Nessuna carta giocata finora.</div>';
+  }
+  box.innerHTML = h;
+}
+/* ---- la tua plancia ---- */
+const EFF_LV = ['inizio', 'pesca 2', '+1 spazio<br>+1 ai dadi', 'pesca 3', '+1 spazio<br>+3 Fama'];
+let ingresso = { n: null, arena: new Set() };
+let finale = { n: null, gate: new Set() };
+function disegnaMe(A) {
+  const io = ioId(), g = V.giocatori[io];
+  if (!g) { $('#me').innerHTML = ''; return; }
+  const titolo = `<h3>${locale ? 'Plancia di ' + nomeG(io) : 'La tua plancia'}${g.fazione ? ' · ' + R.NOME_FAZ[g.fazione] : ''}</h3>`;
+  const Rq = mia();
+  // inizio partita: solo i tre dadi lanciati
+  if (g.dadi.some(d => d.stato === 'riserva')) {
+    const decido = Rq && Rq.tipo === 'ingresso' && Rq.gioc === io;
+    if (decido && ingresso.n !== Rq.n) ingresso = { n: Rq.n, arena: new Set(g.dadi.map(d => d.id)) };
+    const lanciati = g.dadi.some(d => d.val > 0);
+    if (!lanciati) { $('#me').innerHTML = titolo + '<div class="aiuto">I Dadi Eroe si lanciano dopo la scelta delle Facce.</div>'; return; }
+    const uno = d => { const ar = decido ? ingresso.arena.has(d.id) : null;
+      return `<div class="uno">${htmlDado(d, '')}<div class="scelta"><button data-ing="${d.id}" data-dove="arena" class="${ar === true ? 'on' : ''}" ${decido ? '' : 'disabled'}>Arena</button><button data-ing="${d.id}" data-dove="boost" class="${ar === false ? 'on' : ''}" ${decido ? '' : 'disabled'}>Boost</button></div></div>`; };
+    $('#me').innerHTML = titolo + `<div class="lancio">${g.dadi.map(uno).join('')}</div>` +
+      (decido ? `<div class="riga" style="justify-content:space-between"><span class="aiuto" style="margin:0">Almeno un dado in arena. Quelli nel Boost tengono il valore lanciato.</span><button class="btn oro" id="confIngresso" ${ingresso.arena.size ? '' : 'disabled'}>Conferma</button></div>`
+        : '<div class="aiuto">In attesa del tuo turno di scelta.</div>');
+    return;
+  }
+  const dadoCls = d => (A.dadi.has(d.id) ? 'cliccabile' : '');
+  const livelli = EFF_LV.map((t, k) => `<div class="${k + 1 === g.livello ? 'ora' : k + 1 < g.livello ? 'fatto' : ''}"><b>LV ${k + 1}</b>${t}</div>`).join('');
+  let slot = '';
+  for (let k = 0; k < 3; k++) {
+    const aperto = k < g.spazi, c = g.campo[k];
+    slot += `<div class="slot ${aperto ? '' : 'chiuso'}">${c ? `<img src="assets/carte/${c.n}.jpg" data-zoom="assets/carte/${c.n}.jpg" title="${esc(R.CARTE[c.n].nome)}">${c.dado != null ? htmlDado(trova(c.dado), '') : ''}` : aperto ? `spazio ${k + 1}` : `🔒<br>si apre al LV ${k === 1 ? 3 : 5}`}</div>`;
+  }
+  const decidoFinale = Rq && Rq.tipo === 'finale' && Rq.gioc === io;
+  if (decidoFinale && finale.n !== Rq.n) finale = { n: Rq.n, gate: new Set() };
+  const boost = g.dadi.filter(d => d.stato === 'boost').map(d => decidoFinale
+    ? `<div class="fin">${htmlDado(d, '')}<div class="lancio" style="margin:0"><div class="scelta"><button data-fin="${d.id}" data-dove="boost" class="${finale.gate.has(d.id) ? '' : 'on'}">Resta</button><button data-fin="${d.id}" data-dove="gate" class="${finale.gate.has(d.id) ? 'on' : ''}">Al Gate</button></div></div></div>`
+    : htmlDado(d, dadoCls(d))).join('') || '<span class="aiuto" style="margin:0">vuoto</span>';
+  const inAttesa = g.dadi.filter(d => d.stato === 'attesa');
+  const daPiazzare = Rq && Rq.tipo === 'piazza' ? Rq.dadoDaPiazzare : null;
+  const zonaAttesa = inAttesa.length ? `<div class="zonaDadi attesa" style="margin-bottom:8px"><div class="et">DA PIAZZARE IN ARENA</div><div class="dd">${inAttesa.map(d => htmlDado(d, d.id === daPiazzare ? 'sel2' : '')).join('')}</div></div>` : '';
+  const gate = g.dadi.filter(d => d.stato === 'gate').map(d => htmlDado(d, '')).join('') || '<span class="aiuto" style="margin:0">vuoto</span>';
+  $('#me').innerHTML = titolo + `<div class="plancia">
+    <div class="livelli">${livelli}</div>
+    <div class="spazi">
+      <div class="pila"><div class="mz" style="background-image:url(assets/dorsi/${g.fazione || 'evento'}.jpg)">${g.mazzo}</div>mazzo</div>
+      <div class="slot3">${slot}</div>
+      <div class="pila"><div class="mz sc">${g.scarti.length}</div>scarti</div>
+    </div>
+    ${zonaAttesa}<div class="dadiZona"><div class="zonaDadi"><div class="et">BOOST</div><div class="dd">${boost}</div></div><div class="zonaDadi"><div class="et">GATE <span style="font-size:11px;color:var(--tenue)">(a 6)</span></div><div class="dd">${gate}</div></div></div>
+    ${decidoFinale ? '<div class="riga" style="justify-content:flex-end;margin-top:6px"><button class="btn oro" id="confFinale">Conferma e chiudi il turno</button></div>' : ''}
+  </div>`;
+}
+function disegnaMano(A) {
+  const g = V.giocatori[ioId()];
+  const mano = g && Array.isArray(g.mano) ? g.mano : [];
+  const Rq = mia();
+  const scelte = Rq && Rq.scelte && Rq.scelte.costo ? Rq.scelte.costo : [];
+  $('#mano').innerHTML = mano.map(c => `<div class="carta ${A.carte.has(c.uid) ? 'cliccabile' : ''} ${scelte.includes(c.uid) || (Rq && Rq.carta === c.uid) ? 'scelta' : ''}" data-carta="${c.uid}" data-zoom="assets/carte/${c.n}.jpg"><img src="assets/carte/${c.n}.jpg" alt="${esc(R.CARTE[c.n].nome)}"></div>`).join('')
+    || (g && g.fazione ? '<span class="aiuto">Nessuna carta in mano.</span>' : '');
+}
+/* ---- avversari attorno alla mappa ---- */
+function htmlAvversario(g, A) {
+  const turno = V.turno ? V.turno.gioc : null;
+  const nm = typeof g.mano === 'number' ? g.mano : g.mano.length;
+  const boost = g.dadi.filter(d => d.stato === 'boost').map(d => htmlDado(d, A.dadi.has(d.id) ? 'cliccabile' : '')).join('') || '—';
+  const gate = g.dadi.filter(d => d.stato === 'gate').length;
+  let slot = '';
+  for (let k = 0; k < 3; k++) { const c = g.campo[k];
+    slot += c ? `<span><img src="assets/carte/${c.n}.jpg" data-zoom="assets/carte/${c.n}.jpg" title="${esc(R.CARTE[c.n].nome)}">${c.dado != null ? htmlDado(trova(c.dado), '') : ''}</span>` : k < g.spazi ? '<span></span>' : '<span class="chiuso">🔒</span>'; }
+  return `<div class="avv ${g.id === turno ? 'attivo' : ''}" style="--c:${COL[g.fazione] || '#777'}">
+    <div class="testa"><div class="ritratto" style="background-image:${g.fazione ? `url(assets/facce/${g.fazione}.jpg)` : 'none'}"></div>
+      <div><div class="nome">${esc(g.nome)}</div><div class="sotto">${R.NOME_FAZ[g.fazione] || 'sceglie…'} · LV ${g.livello}</div></div></div>
+    <div class="stats"><span>mano <b>${nm}</b></span><span>mazzo <b>${g.mazzo}</b></span><span>scarti <b>${g.scarti.length}</b></span></div>
+    <div class="fila">boost: ${boost}${gate ? ` · gate <b style="color:var(--crema)">${gate}</b>` : ''}</div>
+    <div class="miniSlot">${slot}</div>
+  </div>`;
+}
+function disegnaAvversari(A) {
+  const io = ioId(), pos = { 1: '', 2: '', 3: '' };
+  for (const g of V.giocatori) {
+    if (g.id === io) continue;
+    let rel = g.lato != null ? relativo(g.lato) : 2;
+    if (V.n === 2) rel = 2;
+    pos[rel] += htmlAvversario(g, A);
+  }
+  $('#avv-sx').innerHTML = pos[1]; $('#avv-su').innerHTML = pos[2]; $('#avv-dx').innerHTML = pos[3];
+}
+/* ---- specchietto delle regole ---- */
+const SCHEDE = {
+  turno: ['Turno', `
+    <div class="fase"><b>1 · Gate</b><span>I dadi nel Gate rientrano a 6 su un tassello libero del tuo lato. Poi prendi <b>1 Fama per ogni tuo dado in arena</b>.</span></div>
+    <div class="fase"><b>2 · Pesca</b><span>Peschi 2 carte. A mazzo finito non si pesca più.</span></div>
+    <div class="fase"><b>3 · Azione</b><span>3 slot: ogni <b>movimento</b> o <b>attacco</b> ne usa uno. Le carte senza trigger le giochi quando vuoi, se hai uno spazio carta libero e il Boost per il costo.</span></div>
+    <div class="fase"><b>4 · Finale</b><span>Scarti fino a 4 carte, poi scegli quali dadi del Boost passano al Gate: tornano a 6 e rientrano nel tuo prossimo turno.</span></div>`],
+  simboli: ['Simboli', `
+    <div class="sim"><span class="ic"><img src="assets/icone/boost.png" alt=""></span><span><b>Boost</b>: costo e X delle carte si pagano con il valore dei tuoi dadi nel Boost, anche prendendo da più dadi. Un dado che arriva a 0 va al Gate.</span></div>
+    <div class="sim"><span class="ic"><img src="assets/icone/movimento.png" alt=""></span><span><b>Movimento</b>: la carta si gioca solo quando qualcuno muove un dado.</span></div>
+    <div class="sim"><span class="ic"><img src="assets/icone/combattimento.png" alt=""></span><span><b>Combattimento</b>: la carta si gioca solo quando qualcuno attacca.</span></div>
+    <div class="sim"><span class="ic"><img src="assets/icone/box.png" alt=""></span><span><b>Box</b>: dopo l'uso la carta esce dalla partita.</span></div>
+    <div class="sim"><span class="ic"><img src="assets/icone/scarti.png" alt=""></span><span><b>Scarti</b>: dopo l'uso la carta va negli scarti.</span></div>
+    <div class="sim"><span class="ic parola">AGGEG-<br>GIO</span><span>Resta nel suo spazio carta fino all'inizio del tuo prossimo turno.</span></div>
+    <div class="sim"><span class="ic parola">RAC-<br>CONTO</span><span>Occupa lo spazio solo finché si risolve.</span></div>
+    <p class="n">Senza simbolo di trigger: nel tuo turno quando vuoi, o come reazione nel turno degli altri.</p>`],
+  altezze: ['Altezze', `
+    <h4>Movimento <span class="n">(da → a)</span></h4>
+    <table><tr><th></th><th>basso</th><th>medio</th><th>alto</th></tr>
+      <tr><th>basso</th><td>0</td><td class="meno">−1</td><td class="meno">−2</td></tr>
+      <tr><th>medio</th><td class="piu">+1</td><td>0</td><td class="meno">−1</td></tr>
+      <tr><th>alto</th><td class="piu">+2</td><td class="piu">+1</td><td>0</td></tr></table>
+    <p class="n">Scendere carica, salire stanca. Massimo 6; a 0 il dado muore e va nel Boost come 1. Un passo in ortogonale, mai su un tassello occupato.</p>
+    <h4>Attacco <span class="n">(bonus di chi attacca)</span></h4>
+    <table><tr><th></th><th>su basso</th><th>su medio</th><th>su alto</th></tr>
+      <tr><th>da basso</th><td>0</td><td>0</td><td>0</td></tr>
+      <tr><th>da medio</th><td class="piu">+1</td><td>0</td><td>0</td></tr>
+      <tr><th>da alto</th><td class="piu">+2</td><td class="piu">+1</td><td>0</td></tr></table>
+    <p class="n">Ortogonale, distanza 1. Forza = valore + bonus + carte. Se è ≥ del valore del difensore lo uccide: va nel suo Boost con il suo valore. Il difensore non ha bonus.</p>`],
+  fama: ['Fama', `
+    <ul>
+      <li><b>Uccisione in attacco</b>: il valore del dado ucciso, e sali di 1 livello (fino al 5).</li>
+      <li><b>Uccisione con una carta</b> (danno o valore tolto): 3, senza livello.</li>
+      <li><b>Fase Gate</b>: 1 per ogni tuo dado in arena.</li>
+      <li><b>Lago Moltiplicatore</b>: 1, 2 o 4 secondo l'altezza di chi attacca, se uccide.</li>
+      <li><b>Livello 5</b>: +3.</li>
+      <li>Morti per eventi o salite: nessuno prende Fama.</li>
+    </ul>
+    <h4>Fine partita</h4>
+    <p>Si chiude il round in cui esce la terza carta evento dello stesso simbolo. Punti = <b>Fama</b> + <b>valore dei dadi in campo</b> + <b>1 per ogni dado nel Boost o nel Gate</b>.</p>`],
+  catena: ['Catena', `
+    <ol>
+      <li>Quando si innesca un'azione (movimento, attacco o carta) parte chi l'ha innescata, poi gli altri in ordine di turno.</li>
+      <li>Al tuo momento giochi una carta o passi: chi passa è fuori da questa catena.</li>
+      <li>Se qualcuno ha giocato, si rifà il giro solo tra chi non ha passato.</li>
+      <li>Si risolve <b>dall'ultima carta alla prima</b>, poi l'azione.</li>
+    </ol>
+    <p class="n">Ogni carta usa uno spazio carta, anche nel turno degli altri: senza spazi liberi non si gioca. Agli eventi non si risponde con le carte.</p>`],
+};
+let scheda = ls.get('randomir:scheda') || 'turno';
+function disegnaRegole() {
+  if (!SCHEDE[scheda]) scheda = 'turno';
+  $('#schede').innerHTML = Object.entries(SCHEDE).map(([k, [nome]]) => `<button data-scheda="${k}" class="${k === scheda ? 'on' : ''}">${nome}</button>`).join('');
+  $('#regCorpo').innerHTML = SCHEDE[scheda][1];
+}
+disegnaRegole();
+let nLog = -1;
+function disegnaRegistro() {
+  const el = $('#registro'); const L = V.log;
+  const ultimo = L.length ? L[L.length - 1].n : -1;
+  if (ultimo === nLog) return; nLog = ultimo;
+  el.innerHTML = L.slice(-200).map(l => `<div class="${/^— Round/.test(l.txt) ? 'round' : ''} ${l.solo !== undefined ? 'priv' : ''}">${esc(l.txt)}</div>`).join('');
+  el.scrollTop = el.scrollHeight;
+}
+function disegnaOverlay() {
+  const ov = $('#overlay'), Rq = V.richiesta;
+  if (V.finita) {
+    const righe = V.punteggi.slice().sort((a, b) => b.totale - a.totale).map(p => `<tr><td style="color:${COL[p.fazione]};font-weight:700">${esc(p.nome)}</td><td>${p.fama}</td><td>${p.dadiInCampo}</td><td>${p.dadiFuori}</td><td><b>${p.totale}</b></td></tr>`).join('');
+    const vinc = V.vincitori.map(i => esc(V.giocatori[i].nome)).join(' e ');
+    const host = locale || (LOBBY && LOBBY.io === 0);
+    ov.innerHTML = `<div class="scheda fine"><h1 style="font-size:44px">${V.vincitori.length > 1 ? 'Parità!' : 'Vince ' + vinc}</h1>
+      <table><tr><th>Faccia</th><th>Fama</th><th>Dadi in campo</th><th>Boost/Gate</th><th>Totale</th></tr>${righe}</table>
+      <div class="riga" style="justify-content:center;margin-top:10px">${host ? '<button class="btn oro" id="rivincita">Rivincita</button>' : '<span class="nota">Chi ha creato la partita può lanciare la rivincita.</span>'}<button class="btn chiaro" id="chiudiFine">Guarda la mappa</button></div></div>`;
+    if (!ov.dataset.chiuso) ov.classList.remove('hidden');
+    return;
+  }
+  ov.dataset.chiuso = '';
+  if (V.avviso) { ov.innerHTML = htmlBanner(V.avviso); ov.classList.remove('hidden'); return; }
+  if (Rq && Rq.tipo === 'fazione') {
+    const mine = !Rq.altrui; const prese = V.giocatori.map(g => g.fazione).filter(Boolean);
+    const card = z => { const o = mine ? Rq.opzioni.find(x => x.val === z) : null; const presa = prese.includes(z);
+      return `<div class="faccia ${presa || !o ? 'presa' : ''}" style="border-color:${COL[z]}" ${o ? `data-opt="${o.i}"` : ''}><img src="assets/facce/${z}.jpg"><h4 style="color:${COL[z]}">${R.NOME_FAZ[z]}</h4><p>${DESCR[z]}</p>${presa ? `<p><b>presa da ${esc(V.giocatori.find(g => g.fazione === z).nome)}</b></p>` : ''}</div>`; };
+    ov.innerHTML = `<div><div class="passaggio">${mine ? (locale ? `${esc(V.giocatori[Rq.gioc].nome)}, scegli` : 'Scegli') + ' la tua Faccia della Contea' : `${esc(V.giocatori[Rq.gioc].nome)} sta scegliendo la sua Faccia…`}</div>
+      <div class="facce" style="margin-top:16px">${R.FAZIONI.map(card).join('')}</div></div>`;
+    ov.classList.remove('hidden'); return;
+  }
+  ov.classList.add('hidden');
+}
+/* ---- banner: evento, Dado Destino, uccisioni ---- */
+const NOMI_T = { terra: 'Terra', fuoco: 'Fuoco', acqua: 'Acqua' };
+const NOMI_E = { positivo: 'positivo', negativo: 'negativo', destino: 'del Destino' };
+const dadoB = (v, fz, g) => `<span class="dado dd ${g === 'xl' ? 'xl' : g ? 'g' : ''}">${svgDado(v, fz)}</span>`;
+const fzDi = gid => V.giocatori[gid].fazione || 'destino';
+function htmlBanner(B) {
+  const mio = mia() && mia().tipo === 'avviso';
+  const chi = esc(V.giocatori[B.gioc].nome);
+  const piede = `<div class="piede">${mio ? '<button class="btn oro" data-opt="0">Ok, avanti</button>' : `<span class="nota">In attesa che ${chi} dia l'ok…</span>`}</div>`;
+  let h = '';
+  for (const a of B.a.filter(x => x.tipo !== 'uccisione')) {
+    if (a.tipo === 'destino') {
+      h += `<h1>Il Dado Destino</h1><p class="sott">Ognuno lancia il Dado Destino: il più alto inizia.</p>`;
+      a.lanci.forEach((giro, k) => {
+        const mx = Math.max(...giro.map(x => x.t));
+        h += `${k ? '<p class="sott" style="margin:6px 0 0">Spareggio</p>' : ''}<div class="giro">${giro.map(x => `<div class="${x.t === mx && k === a.lanci.length - 1 ? 'vince' : ''}">${dadoB(x.t, 'destino', true)}${esc(V.giocatori[x.id].nome)}</div>`).join('')}</div>`;
+      });
+      h += `<div class="ordine">Inizia ${esc(V.giocatori[a.primo].nome)}</div><p class="sott" style="margin-top:4px">Ordine di turno: ${a.ordine.map(i => esc(V.giocatori[i].nome)).join(' → ')}<br>Le Facce si scelgono dall'ultimo al primo.</p>`;
+    }
+    if (a.tipo === 'tiro') {
+      const g = V.giocatori[a.chi], K = R.CARTE[a.carta];
+      h += `<h1>Dado Destino!</h1><div class="tiro">${dadoB(a.tiro, 'destino', 'xl')}<div>
+        <div class="cartaTiro"><img src="assets/carte/${a.carta}.jpg" alt=""><span><b style="color:${COL[g.fazione]}">${esc(g.nome)}</b> lancia il Dado Destino con <b>${esc(K.nome)}</b></span></div>
+        <div class="esito">Esce <b style="font-size:26px">${a.tiro}</b>${a.esito ? ': ' + esc(a.esito) + '.' : '.'}</div></div></div>`;
+    }
+    if (a.tipo === 'evento') {
+      const e = a.e, T = NOMI_T[e.tipo];
+      const regola = e.eff === 'positivo' ? `Ogni dado su ${T} guadagna valore: +2 in basso, +1 a metà, +0 in alto.`
+        : e.eff === 'negativo' ? `Ogni dado su ${T} subisce danni: 2 in alto, 1 a metà, 0 in basso.`
+        : `Si lancia il Dado Destino: tutti i dadi su ${T} prendono quel valore.`;
+      const righe = a.dadi.map(d => `<div class="rd">${dadoB(d.prima, fzDi(d.prop))}<span class="freccia">→</span>${d.morto ? '<span class="morto">eliminato</span>' : dadoB(d.dopo, fzDi(d.prop))}<span>${esc(V.giocatori[d.prop].nome)} · ${R.nomeT(d.pos)} (${R.NOME_ALT[d.alt]})${!d.morto && d.prima === d.dopo ? ' · nessun effetto' : ''}</span></div>`).join('');
+      h += `<h1>Round ${a.round}</h1><div class="ev"><img src="assets/eventi/${e.tipo}_${e.eff}.jpg" alt=""><div>
+        <div class="titEv">Evento ${T} ${NOMI_E[e.eff]}</div><p>${regola}</p>
+        ${e.tiro ? `<div class="tiro" style="margin:12px 0">${dadoB(e.tiro, 'destino', 'xl')}<div class="esito">Il Dado Destino dice <b style="font-size:26px">${e.tiro}</b>: tutti i dadi su ${T} valgono ${e.tiro}.</div></div>` : ''}
+        ${a.annullato ? '<p class="morto">La Muraglia ha annullato tutti i danni di questo evento.</p>' : ''}
+        <div class="righe">${righe || `<p class="nota">Nessun dado su ${T}: non succede nulla.</p>`}</div>
+        ${a.ultimo ? `<p style="margin-top:10px"><span class="ultimo">Terza carta ${T}: è l'ultimo round!</span></p>` : ''}
+      </div></div>`;
+    }
+  }
+  const kills = B.a.filter(x => x.tipo === 'uccisione');
+  if (kills.length) {
+    h += `<h1>${kills.length > 1 ? kills.length + ' dadi eliminati' : 'Dado eliminato!'}</h1>`;
+    for (const k of kills) {
+      const killer = k.da != null ? V.giocatori[k.da] : null, vitt = V.giocatori[k.prop];
+      const sinistra = k.causa === 'attacco' && k.att != null ? dadoB(k.attVal, fzDi(trova(k.att).prop), true) : k.carta ? `<img src="assets/carte/${k.carta}.jpg" style="width:84px;border-radius:8px">` : '';
+      const come = k.causa === 'attacco' ? `in attacco: <b>${k.forza}</b> contro <b>${k.valore}</b>` : `con ${k.carta ? `<b>${esc(R.CARTE[k.carta].nome)}</b>` : 'una carta'}`;
+      const premio = killer && k.fama ? `<br><b style="color:${COL[killer.fazione]}">+${k.fama} Fama</b> a ${esc(killer.nome)}${k.livello ? ` · sale al <b>livello ${k.livello}</b> (${['', '', 'pesca 2 carte', '+1 spazio carta e +1 ai suoi dadi in campo', 'pesca 3 carte', '+1 spazio carta e +3 Fama'][k.livello]})` : ''}` : killer && killer.id === k.prop ? '<br>Era un suo dado: nessuna Fama.' : '';
+      h += `<div class="kill">${sinistra}<span class="vs">✕</span>${dadoB(k.valore, fzDi(k.prop), true)}</div>
+        <p class="esito">${killer ? `<b style="color:${COL[killer.fazione]}">${esc(killer.nome)}</b> elimina` : 'Eliminato'} il dado di <b style="color:${COL[vitt.fazione]}">${esc(vitt.nome)}</b> su ${R.nomeT(k.pos)}, ${come}.${premio}<br><span class="nota">Il dado va nel Boost di ${esc(vitt.nome)} ${k.causa === 'attacco' ? `con il suo valore (${k.valore})` : 'come 1'}.</span></p>`;
+    }
+  }
+  return `<div class="scheda banner ${B.a.some(x => x.tipo === 'evento') ? 'grande' : ''}">${h}${piede}</div>`;
+}
+function disegna() {
+  if (!V) return;
+  const A = analizza();
+  disegnaTesta(); disegnaAvversari(A); disegnaMano(A); misura();
+  disegnaMappa(A); disegnaEvento(); disegnaFama(); disegnaCronaca(); disegnaCatena(); disegnaDomanda(A); disegnaMe(A); disegnaRegistro(); disegnaOverlay();
+}
+
+/* ---------------- eventi del mouse ---------------- */
+document.addEventListener('click', e => {
+  const t = e.target;
+  const ing = t.closest('[data-ing]');
+  if (ing) { const id = +ing.dataset.ing; if (ing.dataset.dove === 'arena') ingresso.arena.add(id); else ingresso.arena.delete(id); return disegna(); }
+  if (t.closest('#confIngresso')) {
+    const Rq = mia(); if (!Rq) return;
+    const voglio = [...ingresso.arena].sort((a, b) => a - b).join(',');
+    const o = Rq.opzioni.find(x => x.dadi && x.dadi.slice().sort((a, b) => a - b).join(',') === voglio);
+    if (o) scegli(o.i); return;
+  }
+  const opt = t.closest('[data-opt]'); if (opt) return scegli(+opt.dataset.opt);
+  const gc = t.closest('[data-gioca]'); if (gc) { const o = mia() && mia().opzioni[+gc.dataset.gioca]; if (o) apriConferma(o); return; }
+  if (t.closest('#annullaCarta') || t.id === 'conferma') { chiudiConferma(); return; }
+  const fg = t.closest('[data-fin]'); if (fg) { const id = +fg.dataset.fin; if (fg.dataset.dove === 'gate') finale.gate.add(id); else finale.gate.delete(id); return disegna(); }
+  if (t.closest('#confFinale')) {
+    const Rq = mia(); if (!Rq) return;
+    const voglio = [...finale.gate].sort((a, b) => a - b).join(',');
+    const o = Rq.opzioni.find(x => x.dadi && x.dadi.slice().sort((a, b) => a - b).join(',') === voglio);
+    if (o) scegli(o.i); return;
+  }
+  if (t.closest('#tutte')) { mostraTutte = !mostraTutte; return disegna(); }
+  if (t.closest('#apriRegistro')) { $('#colRegistro').classList.toggle('aperto'); return; }
+  const sk = t.closest('[data-scheda]'); if (sk) { scheda = sk.dataset.scheda; ls.set('randomir:scheda', scheda); disegnaRegole(); return; }
+  if (t.closest('#rivincita')) { if (locale) { avviaLocale(V.giocatori.map(g => g.nome)); } else rete.ws.send(JSON.stringify({ t: 'rivincita' })); $('#overlay').dataset.chiuso = ''; return; }
+  if (t.closest('#chiudiFine')) { $('#overlay').dataset.chiuso = '1'; $('#overlay').classList.add('hidden'); return; }
+  const d = t.closest('[data-dado]'); if (d && modo === 'gioco') return clicDado(+d.dataset.dado);
+  const c = t.closest('[data-carta]'); if (c) return clicCarta(+c.dataset.carta);
+  const ts = t.closest('[data-tassello]'); if (ts) return clicTassello(+ts.dataset.tassello);
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && sel !== null) { sel = null; disegna(); } });
+// ingrandimento delle carte: sopra la mappa, dove c'è spazio
+document.addEventListener('mouseover', e => {
+  const z = e.target.closest('[data-zoom]'); const box = $('#zoom');
+  if (!z) { box.style.display = 'none'; return; }
+  box.querySelector('img').src = z.dataset.zoom;
+  const m = $('#mappa').getBoundingClientRect();
+  const lato = Math.max(260, Math.min(440, m.width * 0.8, innerHeight - 40));
+  let x = m.left + (m.width - lato) / 2, y = m.top + (m.height - lato) / 2;
+  if (m.width === 0) { x = (innerWidth - lato) / 2; y = 60; }
+  y = Math.max(10, Math.min(y, innerHeight - lato - 10));
+  Object.assign(box.style, { display: 'block', width: lato + 'px', left: x + 'px', top: y + 'px' });
+});
+addEventListener('resize', () => { disegna(); });
+function toast(msg) { const t = document.createElement('div'); t.className = 'toast'; t.textContent = msg; document.body.appendChild(t); setTimeout(() => t.remove(), 3500); }
+
+/* ---------------- schermate ---------------- */
+function mostra(m) {
+  modo = m;
+  $('#home').classList.toggle('hidden', m !== 'home'); $('#lobby').classList.toggle('hidden', m !== 'lobby'); $('#gioco').classList.toggle('hidden', m !== 'gioco');
+  if (m === 'gioco') disegna();
+  if (m !== 'gioco') $('#overlay').classList.add('hidden');
+}
+let nOnline = 2, nLocale = 3;
+document.querySelectorAll('[data-n]').forEach(b => b.onclick = () => { nOnline = +b.dataset.n; document.querySelectorAll('[data-n]').forEach(x => x.classList.toggle('on', x === b)); });
+document.querySelectorAll('[data-ln]').forEach(b => b.onclick = () => { nLocale = +b.dataset.ln; document.querySelectorAll('[data-ln]').forEach(x => x.classList.toggle('on', x === b)); nomiLocali(); });
+function nomiLocali() {
+  const vecchi = [...document.querySelectorAll('#nomiLocali input')].map(i => i.value);
+  $('#nomiLocali').innerHTML = Array.from({ length: nLocale }, (_, k) => `<input placeholder="Giocatore ${k + 1}" value="${esc(vecchi[k] || '')}" maxlength="20">`).join('');
+}
+nomiLocali();
+$('#nome').value = ls.get('randomir:nome') || '';
+$('#versioneHome').textContent = 'Regolamento ' + R.VERSIONE;
+// i nomi di chi ha già giocato: si sceglie con un clic, così l'archivio non si confonde
+let NOMI_NOTI = [];
+function disegnaNomi() {
+  const cur = $('#nome').value.trim().toLowerCase();
+  $('#nomiNoti').innerHTML = NOMI_NOTI.length ? '<span class="etich">Hai già giocato? Scegli il tuo nome:</span>' + NOMI_NOTI.map(n => `<button data-nome="${esc(n)}" class="${n.toLowerCase() === cur ? 'on' : ''}">${esc(n)}</button>`).join('') : '';
+}
+$('#nomiNoti').onclick = e => { const b = e.target.closest('[data-nome]'); if (!b) return; $('#nome').value = b.dataset.nome; disegnaNomi(); };
+$('#nome').oninput = disegnaNomi;
+if (online()) fetch('/api/nomi', { cache: 'no-store' }).then(r => r.ok ? r.json() : []).then(n => { NOMI_NOTI = Array.isArray(n) ? n : []; disegnaNomi(); }).catch(() => {});
+$('#riprendiLocale').classList.toggle('hidden', !ls.get('randomir:locale'));
+
+/* ---------------- tavolo locale ---------------- */
+function avviaLocale(nomi) {
+  locale = R.nuovaPartita({ seed: (Math.random() * 2 ** 32) >>> 0, nomi });
+  rete = null; salvaLocale(); aggiornaLocale(); mostra('gioco');
+}
+function salvaLocale() { ls.set('randomir:locale', JSON.stringify(locale)); }
+function aggiornaLocale() {
+  const d = R.decisore(locale); if (d !== null) ultimoDecisoreLocale = d;
+  V = R.vista(locale, ultimoDecisoreLocale);
+  disegna();
+}
+$('#locale').onclick = () => { const nomi = [...document.querySelectorAll('#nomiLocali input')].map((i, k) => i.value.trim() || 'Giocatore ' + (k + 1)); avviaLocale(nomi); };
+$('#riprendiLocale').onclick = () => { try { locale = JSON.parse(ls.get('randomir:locale')); rete = null; aggiornaLocale(); mostra('gioco'); } catch (e) { toast('Impossibile riprendere la partita locale'); } };
+$('#menu').onclick = () => {
+  if (rete && !confirm('Esci dalla partita? Non verrà registrata nell\'archivio finché non arriva alla fine. Potrai rientrare con lo stesso codice da questo dispositivo.')) return;
+  if (rete) { rete.chiudi = true; try { rete.ws.close(); } catch (e) {} rete = null; }
+  ls.del('randomir:ultima'); history.replaceState(null, '', location.pathname + location.search);
+  locale = null; V = null; $('#riprendiLocale').classList.toggle('hidden', !ls.get('randomir:locale')); mostra('home');
+};
+
+/* ---------------- rete ---------------- */
+const ALFA = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+const nuovoCodice = () => Array.from({ length: 4 }, () => ALFA[Math.floor(Math.random() * ALFA.length)]).join('');
+function online() { return location.protocol === 'http:' || location.protocol === 'https:'; }
+function collega(codice, primo) {
+  if (!online()) { $('#errHome').textContent = 'Per giocare online apri il gioco dal suo indirizzo web, non dal file.'; return; }
+  const url = `${location.protocol === 'https:' ? 'wss' : 'ws'}://${location.host}/api/stanza/${codice}`;
+  const ws = new WebSocket(url);
+  const r = rete = { ws, codice, token: ls.get('randomir:token:' + codice), tentativi: (rete && rete.codice === codice ? rete.tentativi : 0) };
+  ws.onopen = () => { r.tentativi = 0; ws.send(JSON.stringify(primo || { t: 'entra', nome: $('#nome').value.trim(), token: r.token })); };
+  ws.onmessage = ev => {
+    const m = JSON.parse(ev.data);
+    if (m.t === 'errore') { if (modo === 'home') $('#errHome').textContent = m.msg; else if (modo === 'lobby') $('#errLobby').textContent = m.msg; else toast(m.msg);
+      if (modo === 'home') { r.chiudi = true; ws.close(); } return; }
+    if (m.t === 'benvenuto') { r.posto = m.posto; r.token = m.token; ls.set('randomir:token:' + codice, m.token); ls.set('randomir:ultima', codice); history.replaceState(null, '', '#' + codice); return; }
+    if (m.t === 'stato') {
+      LOBBY = m.lobby;
+      if (!m.v) { disegnaLobby(); if (modo !== 'lobby') mostra('lobby'); return; }
+      const nuovo = !V || (V.richiesta && m.v.richiesta && V.richiesta.n !== m.v.richiesta.n);
+      if (nuovo) sel = null;
+      V = m.v; if (modo !== 'gioco') mostra('gioco'); else disegna();
+    }
+  };
+  ws.onclose = () => {
+    if (r.chiudi || rete !== r) return;
+    r.tentativi++;
+    if (r.tentativi > 1) toast('Connessione persa, riprovo…');
+    setTimeout(() => { if (rete === r) collega(codice); }, Math.min(5000, 400 * r.tentativi));
+  };
+}
+function disegnaLobby() {
+  const L = LOBBY;
+  $('#lCodice').textContent = L.codice;
+  $('#lLink').textContent = location.origin + location.pathname + '#' + L.codice;
+  $('#lPosti').innerHTML = Array.from({ length: L.n }, (_, i) => { const p = L.posti[i];
+    return `<li>${p ? `<span><span class="punto ${p.connesso ? 'on' : ''}"></span>${esc(p.nome)}${i === 0 ? ' · ha creato la partita' : ''}${i === L.io ? ' (tu)' : ''}</span>` : '<span class="nota">posto libero…</span>'}</li>`; }).join('');
+  const host = L.io === 0;
+  $('#avvia').classList.toggle('hidden', !host);
+  $('#avvia').disabled = L.posti.length < 2;
+  $('#avvia').textContent = L.posti.length < L.n ? `Inizia in ${L.posti.length}` : 'Che la battaglia inizi!';
+  $('#lAttesa').textContent = host ? (L.posti.length < L.n ? 'Puoi aspettare che entrino tutti o iniziare con chi c\'è.' : '') : 'In attesa che chi ha creato la partita dia il via.';
+}
+$('#crea').onclick = () => {
+  const nome = $('#nome').value.trim(); if (!nome) { $('#errHome').textContent = 'Scrivi il tuo nome.'; return; }
+  ls.set('randomir:nome', nome); $('#errHome').textContent = '';
+  const codice = nuovoCodice(); collega(codice, { t: 'crea', nome, n: nOnline });
+};
+$('#entra').onclick = () => {
+  const nome = $('#nome').value.trim(), codice = $('#codice').value.trim().toUpperCase();
+  if (!codice) { $('#errHome').textContent = 'Scrivi il codice.'; return; }
+  if (!nome && !ls.get('randomir:token:' + codice)) { $('#errHome').textContent = 'Scrivi il tuo nome.'; return; }
+  ls.set('randomir:nome', nome); $('#errHome').textContent = ''; collega(codice);
+};
+$('#avvia').onclick = () => rete && rete.ws.send(JSON.stringify({ t: 'avvia' }));
+$('#copia').onclick = () => { try { navigator.clipboard.writeText($('#lLink').textContent); toast('Indirizzo copiato'); } catch (e) {} };
+$('#esciLobby').onclick = () => { if (rete) { rete.chiudi = true; rete.ws.close(); rete = null; } history.replaceState(null, '', location.pathname); mostra('home'); };
+// arrivo da un link con il codice
+const h = location.hash.replace('#', '').toUpperCase();
+if (/^[A-Z0-9]{4,6}$/.test(h)) { $('#codice').value = h; if (ls.get('randomir:token:' + h)) collega(h); }
+</script>
+</body>
+</html>

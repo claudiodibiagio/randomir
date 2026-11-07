@@ -8,10 +8,10 @@ Un solo repository, un solo servizio: Cloudflare serve il gioco (cartella `publi
 public/index.html     il gioco (interfaccia)
 public/motore.js      le regole: lo stesso file gira nel browser e sul server
 public/archivio.html  l'archivio delle partite finite, con tutte le statistiche
-public/assets/        tasselli, carte, dorsi, eventi, plancia, contatori Fama, ritratti
+public/assets/        tasselli, carte, dorsi, eventi, plancia, contatori Fama, ritratti, icone dei simboli
 src/worker.js         il server: stanze con codice, viste filtrate, salvataggio a ogni mossa, archivio e nomi
 wrangler.toml         configurazione Cloudflare
-test/conformita.js    38 verifiche regola per regola  (node test/conformita.js)
+test/conformita.js    52 verifiche regola per regola  (node test/conformita.js)
 test/casuali.js       partite casuali complete         (node test/casuali.js 1000)
 ```
 
@@ -32,7 +32,7 @@ Da lì in poi ogni commit sul repository ripubblica da solo.
 - Se qualcuno chiude il browser o perde la connessione, riaprendo lo stesso link dallo stesso dispositivo rientra al suo posto.
 - **Tavolo locale**: tutti sullo stesso schermo, a turno. Serve per provare le regole da soli.
 
-Come si gioca sullo schermo: clicca un tuo dado (salta quando può agire), poi una casella tratteggiata per muovere o un dado rosso per attaccare. Le carte giocabili in mano sono illuminate. Passando sopra una carta la vedi in grande. Il registro a destra racconta ogni cosa pubblica.
+Come si gioca sullo schermo: clicca un tuo dado (salta quando può agire), poi una casella tratteggiata per muovere o un dado rosso per attaccare. Le carte giocabili in mano sono illuminate. Passando sopra una carta la vedi in grande. Il registro a destra racconta ogni cosa pubblica; sotto ci sono le **Regole rapide** (Turno, Simboli, Altezze, Fama, Catena): si clicca una scheda per leggerla.
 
 ## Caricare le modifiche
 
@@ -53,22 +53,25 @@ Quando cambi le regole: in `public/motore.js` cambia `const VERSIONE = '1.0'` (e
 
 Il manuale non le decide; le ho implementate così e si cambiano in `public/motore.js`.
 
-1. **Elmo e Martello** valgono sia sui danni delle carte e degli eventi sia sulla forza degli attacchi (Martello +X ai tuoi attacchi, Elmo −X agli attacchi contro i tuoi dadi).
-2. **Fosso dei Calcoli** si gioca quando un tuo dado è il difensore: −X alla forza di quell'attacco. **Copia Incolla** si gioca quando sei tu ad attaccare: +X a quell'attacco.
-3. **Alla Muraglia Quadra!** sceglie una fonte di danno nella catena aperta (Cannone, Fortezza di Gomma, Impatto di Randomir) e ne annulla *tutti* i danni, anche quelli ai dadi degli avversari. Agli **eventi** non si risponde con le carte: si applicano subito.
-4. **Leva Piega-Natura**: le due tessere si scambiano, i dadi restano nelle loro caselle (cambia il terreno sotto di loro).
-5. **Molla Caotica** e **Impatto di Randomir** spostano il dado senza guadagno o perdita per l'altezza; **Rotolatore Velato** invece è un movimento vero (paga e guadagna con l'altezza) e ruba 1 a ogni dado attraversato, amici compresi.
-6. **Un Cubo per un Altro** funziona su qualsiasi Faccia: puoi scambiare anche un dado avversario in mappa con un suo dado Boost.
-7. **Attacchi extra** (Specchi Profondi, Raddoppiatore, La Punta più Alta, Lanci di Randomir) non consumano slot azione; ognuno è un attacco vero, apre la sua catena e, se uccide, dà Fama e livello come un attacco.
-8. **Da Ogni Lato** colpisce i 4 vicini ortogonali con la forza del dado (+ bonus altezza + X); uccidere un dado amico non dà nulla.
-9. **Faccia del Destino**: si sceglie se aggiungere o sottrarre quando si gioca la carta, poi si lancia il Dado Destino.
-10. **Scintille di Randomir**: il valore rubato va a un tuo dado in mappa scelto da te. **Eureka!** lo dona al dado Boost più basso del proprietario.
-11. **Lago Moltiplicatore** lo può giocare solo chi attacca; Fama 1/2/4 secondo l'altezza dell'attaccante, solo se l'attacco uccide.
-12. **Cubi di Vetro** può proteggere qualsiasi dado in mappa. Un attacco dichiarato contro un dado che diventa protetto va a vuoto (lo slot è speso).
-13. **Medaglia Angolare**: in caso di pari valore massimo, tutti i dadi a pari merito restano attaccabili.
-14. Dadi **coperti** (Molla, Torri): non sono in gioco, ma a fine partita il loro valore conta come dado in campo.
-15. Le carte **Racconto** lasciano lo spazio appena si risolvono; le **Aggeggio** all'inizio del tuo turno successivo, prima del Gate (il dado che avevano sopra va al Gate e rientra subito a 6).
-16. Contatore Fama: oltre 40 il segnalino resta sul 40 e mostra il numero.
+1. **Costo e Boost**: il costo delle carte si paga con il valore dei propri dadi Boost, spezzandolo come si vuole su più dadi; anche la X delle carte si può prendere da più dadi. Quando la scelta del dado da cui pagare è una sola, il gioco la fa da solo. Un dado che arriva a 0 va al Gate (già a 6).
+2. **Elmo, Martello, Scarponi**: il dado messo sopra la carta non serve a pagare il costo, che si paga con gli altri dadi Boost. Restano bloccati sulla carta fino all'inizio del tuo turno successivo, poi vanno al Gate e rientrano subito.
+3. **Fase Gate**: prima rientrano i dadi dal Gate, poi si prende 1 Fama per ogni proprio dado in arena, in ogni turno (anche senza rientri). I dadi coperti non contano.
+4. **Fase Finale**: dopo lo scarto a 4 carte si sceglie quali dadi del Boost passano al Gate, a 6, qualunque sia il loro valore.
+5. **Elmo e Martello** valgono sia sui danni sia sulla forza degli attacchi.
+6. **Fosso dei Calcoli** si gioca quando un tuo dado difende, **Copia Incolla** quando attacchi; la X si prende dal Boost avversario (anche da più dadi).
+7. **Alla Muraglia Quadra!** annulla tutti i danni di una fonte nella catena (Cannone, Fortezza di Gomma, Impatto di Randomir). Agli **eventi** non si risponde con le carte.
+8. **Leva Piega-Natura**: le tessere si scambiano, i dadi restano nelle loro caselle.
+9. **Molla Caotica** spinge di X caselle in linea retta; Molla e **Impatto di Randomir** non cambiano il valore per l'altezza. **Rotolatore Velato** sì, e ruba 1 a ogni dado attraversato, amici compresi.
+10. **Un Cubo per un Altro** funziona anche su un dado avversario e il suo Boost.
+11. **Attacchi extra** (Rompere Specchi Prismatici, La Punta più Alta, Lanci di Randomir, Propulsore Potenziale) non costano slot e valgono come attacchi veri (Fama e livello). Specchi: 1-2 attacchi in tutto, dall'uno o dall'altro dei due dadi scambiati. Propulsore: dopo il movimento, contro un dado adiacente.
+12. **Da Ogni Lato** colpisce i 4 vicini ortogonali; uccidere un dado amico non dà nulla.
+13. **Faccia del Destino**: aggiungi o sottrai si sceglie giocando la carta, poi si lancia il Dado Destino.
+14. **Scintille di Randomir**: il valore rubato va a un tuo dado in mappa scelto da te. **Eureka!** lo dona al dado Boost più basso del proprietario.
+15. **Lago Moltiplicatore** lo gioca solo chi attacca: 1/2/4 Fama secondo l'altezza dell'attaccante, solo se l'attacco uccide.
+16. **Cubi di Vetro** può proteggere qualsiasi dado; un attacco già dichiarato contro un dado che diventa protetto va a vuoto.
+17. **Medaglia Angolare**: con più dadi a pari valore massimo, restano attaccabili tutti quelli.
+18. Dadi **coperti**: non sono in gioco, ma a fine partita il loro valore conta come dado in campo.
+19. Il **Raddoppiatore** è uscito dal mazzo: al suo posto c'è Propulsore Potenziale (carta n. 22).
 
 ## Limiti noti
 
