@@ -230,7 +230,10 @@ button{font-family:inherit}
 #registro .round{color:var(--oro2);font-weight:700;margin-top:6px}
 #registro .priv{color:#9fd3c7;font-style:italic}
 /* specchietto delle regole: il 40% basso della colonna */
-#regole{flex:0 0 40%;min-height:0;display:flex;flex-direction:column;border-top:2px solid #5a4630;background:#1d1714}
+#regole{flex:0 0 50%;min-height:0;display:flex;flex-direction:column;background:#1d1714}
+#divisore{flex:0 0 10px;cursor:row-resize;background:#2a201a;border-top:2px solid #5a4630;border-bottom:1px solid #3a2e24;display:flex;align-items:center;justify-content:center;touch-action:none;user-select:none}
+#divisore::after{content:'';width:42px;height:3px;border-radius:2px;background:#7a6248}
+#divisore:hover::after,#divisore.tira::after{background:var(--oro)}
 .regTesta{font-family:'Londrina Solid';font-size:18px;color:var(--oro);padding:8px 12px 4px}
 .regTesta span{font-family:Alegreya;font-size:12px;font-style:italic;color:var(--tenue)}
 .schede{display:flex;flex-wrap:wrap;gap:3px;padding:0 8px 6px}
@@ -397,6 +400,7 @@ button{font-family:inherit}
     <div class="box" id="me"></div>
   </div>
   <div id="colRegistro"><h3>Registro</h3><div id="registro"></div>
+    <div id="divisore" title="Trascina per cambiare lo spazio tra registro e regole"></div>
     <div id="regole"><div class="regTesta">Regole rapide <span>· clicca una scheda per leggerla</span></div><div class="schede" id="schede"></div><div id="regCorpo"></div></div>
   </div>
 </div>
@@ -994,6 +998,20 @@ $('#nomiNoti').onclick = e => { const b = e.target.closest('[data-nome]'); if (!
 $('#nome').oninput = disegnaNomi;
 if (online()) fetch('/api/nomi', { cache: 'no-store' }).then(r => r.ok ? r.json() : []).then(n => { NOMI_NOTI = Array.isArray(n) ? n : []; disegnaNomi(); }).catch(() => {});
 $('#riprendiLocale').classList.toggle('hidden', !ls.get('randomir:locale'));
+
+/* divisore trascinabile tra registro e regole rapide */
+(() => {
+  const col = $('#colRegistro'), reg = $('#regole'), div = $('#divisore');
+  const metti = q => { q = Math.min(85, Math.max(15, q)); reg.style.flexBasis = q + '%'; return q; };
+  let quota = +ls.get('randomir:quotaRegole') || 50; metti(quota);
+  div.addEventListener('pointerdown', e => {
+    e.preventDefault(); div.setPointerCapture(e.pointerId); div.classList.add('tira');
+    const muovi = ev => { const r = col.getBoundingClientRect(); quota = metti((r.bottom - ev.clientY) / r.height * 100); };
+    const fine = () => { div.classList.remove('tira'); div.removeEventListener('pointermove', muovi); div.removeEventListener('pointerup', fine); div.removeEventListener('pointercancel', fine); ls.set('randomir:quotaRegole', Math.round(quota)); };
+    div.addEventListener('pointermove', muovi); div.addEventListener('pointerup', fine); div.addEventListener('pointercancel', fine);
+  });
+  div.addEventListener('dblclick', () => { quota = metti(50); ls.set('randomir:quotaRegole', 50); });
+})();
 
 /* ---------------- tavolo locale ---------------- */
 function avviaLocale(nomi) {
